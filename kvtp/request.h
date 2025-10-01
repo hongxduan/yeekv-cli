@@ -6,10 +6,21 @@
 #define YEEKV_CLI_KVTPREQUEST_H
 #include <vector>
 
+#include "../parser/input_parser.h"
 
+
+#define ZERO '\0'
+
+#define LINE_FEED '\n'
+
+#define PROTOCOL "KVTP/1"
+#define KEY_PREFIX "KEY:"
+#define CMD_PREFIX "CMD:"
+#define ARG_PREFIX "ARGS:"
+#define TTL_PREFIX "TTL:"
 
 namespace kvtp {
-    std::vector<uint8_t> encodeRequest(char *line);
+    std::vector<uint8_t> encodeRequest(InputData data);
 }
 
 

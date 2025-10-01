@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include "include/argparse.hpp"
+#include "kvtp/request.h"
 #include "parser/input_parser.h"
 
 #define PROMPT "yeekv> "
@@ -39,20 +40,22 @@ int main(int argc, char *argv[]) {
 
     std::string input;
 
-    std::cout << input;
-
     while (true) {
         std::cout << PROMPT;
         getline(std::cin, input);
 
         // parse input
-        InputData data =  parseInput(input);
-        if (data.error.size()>0) {
+        InputData data = parseInput(input);
+        if (data.error.size() > 0) {
             std::cout << data.error << std::endl;
             continue;
         }
 
-        send(clientSocket, input.c_str(), strlen(input.c_str()), 0);
+        // encode request
+        auto request = kvtp::encodeRequest(data);
+        std::cout << request.data() << std::endl;
+
+        send(clientSocket, request.data(), request.size(), 0);
         //std::cout << input << std::endl;
     }
 
