@@ -6,7 +6,7 @@
 #define YEEKV_CLI_STRING_UTILITY_H
 #include <string>
 
-namespace utility {
+namespace util {
     std::string toUpper(std::string str);
 }
 

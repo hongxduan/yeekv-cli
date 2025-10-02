@@ -20,6 +20,7 @@
 #define TTL_PREFIX "TTL:"
 
 namespace kvtp {
+    // encode user input command to KVTP request
     std::vector<uint8_t> encodeRequest(InputData data);
 }
 

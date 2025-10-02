@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 4.0)
 project(yeekv_cli)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 add_executable(yeekv-cli main.cpp
         include/argparse.hpp
@@ -11,5 +11,7 @@ add_executable(yeekv-cli main.cpp
         kvtp/response.h
         parser/input_parser.cpp
         parser/input_parser.h
-        utility/string_utility.cpp
-        utility/string_utility.h)
+        util/string_util.cpp
+        util/string_util.h
+        util/byte_util.cpp
+        util/byte_util.h)

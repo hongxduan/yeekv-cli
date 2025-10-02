@@ -8,9 +8,8 @@
 
 
 namespace kvtp {
-
+    // decode KVTP response from server
     std::vector<uint8_t> decodeResponse(std::vector<uint8_t>);
-
 }
 
 

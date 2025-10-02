@@ -10,7 +10,7 @@
 #include <iostream>
 #include <ostream>
 
-#include "../utility/string_utility.h"
+#include "../util/string_util.h"
 
 InputData parseInput(std::string input) {
     InputData data;
@@ -77,7 +77,7 @@ InputData parseInput(std::string input) {
     while (i < pieces.size()) {
         std::string piece = pieces[i];
         if (i == 0) {
-            data.cmd = utility::toUpper(piece);
+            data.cmd = util::toUpper(piece);
         } else {
             // process commands with KEY
             if (data.cmd == "GET" || data.cmd == "GET" || data.cmd == "SET") {
@@ -117,6 +117,6 @@ InputData parseInput(std::string input) {
         i++;
     }
 
-    std::cout << data.cmd << " " << data.key << " " << data.value << std::endl;
+    //std::cout << data.cmd << " " << data.key << " " << data.value << std::endl;
     return data;
 }

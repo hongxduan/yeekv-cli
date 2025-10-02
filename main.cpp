@@ -1,5 +1,6 @@
 #include <cstring>
 #include <iostream>
+#include <bit>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -7,11 +8,15 @@
 #include "include/argparse.hpp"
 #include "kvtp/request.h"
 #include "parser/input_parser.h"
+#include "util/byte_util.h"
 
 #define PROMPT "yeekv> "
 
+void printOS();
+
 int main(int argc, char *argv[]) {
-    // todo: parse argv
+    printOS();
+
     argparse::ArgumentParser parser("yeekv");
 
     parser.add_argument("-h", "--host")
@@ -53,7 +58,6 @@ int main(int argc, char *argv[]) {
 
         // encode request
         auto request = kvtp::encodeRequest(data);
-        std::cout << request.data() << std::endl;
 
         send(clientSocket, request.data(), request.size(), 0);
         //std::cout << input << std::endl;
@@ -61,4 +65,27 @@ int main(int argc, char *argv[]) {
 
     close(clientSocket);
     return 0;
+}
+
+void printOS() {
+    if (std::endian::native == std::endian::little) {
+        std::cout << "little endian" << std::endl;
+        uint32_t i = 32;
+        std::cout << std::hex << i << std::endl;
+        uint32_t j = std::byteswap(i);
+        std::cout << j << " " << std::hex << j << std::endl;
+
+        uint8_t bytes[4];
+        util::uint32_to_le_bytes(i, bytes);
+
+        std::cout << "bytes:" << bytes << std::endl;
+
+        //uint32_t ii = (bytes[3] << 24) | (bytes[2] << 16) | (bytes[1] << 8) | bytes[0];
+        uint32_t ii ;
+        //std::memcpy(&ii, bytes, sizeof(ii));
+        ii = util::convertBeBytesToUint32(bytes);
+        std::cout << std::dec << ii << std::endl;
+    } else if (std::endian::native == std::endian::big) {
+        std::cout << "big endian" << std::endl;
+    }
 }
