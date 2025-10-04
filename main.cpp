@@ -59,6 +59,7 @@ int main(int argc, char *argv[]) {
         // encode request
         auto request = kvtp::encodeRequest(data);
 
+        // why request.size() -1? to remove the ending '\0'
         send(clientSocket, request.data(), request.size(), 0);
         //std::cout << input << std::endl;
     }
@@ -68,7 +69,8 @@ int main(int argc, char *argv[]) {
 }
 
 void printOS() {
-    if (std::endian::native == std::endian::little) {
+    /*
+    if constexpr (std::endian::native == std::endian::little) {
         std::cout << "little endian" << std::endl;
         uint32_t i = 32;
         std::cout << std::hex << i << std::endl;
@@ -88,4 +90,5 @@ void printOS() {
     } else if (std::endian::native == std::endian::big) {
         std::cout << "big endian" << std::endl;
     }
+    */
 }
