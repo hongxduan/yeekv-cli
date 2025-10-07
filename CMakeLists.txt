@@ -14,4 +14,5 @@ add_executable(yeekv-cli main.cpp
         util/string_util.cpp
         util/string_util.h
         util/byte_util.cpp
-        util/byte_util.h)
+        util/byte_util.h
+        kvtp/kvtp.h)

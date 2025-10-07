@@ -21,7 +21,7 @@
 
 namespace kvtp {
     // encode user input command to KVTP request
-    std::vector<uint8_t> encodeRequest(InputData data);
+    std::vector<uint8_t> encode_request(InputData data);
 }
 
 

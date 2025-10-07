@@ -28,3 +28,19 @@ void util::uint16_to_bytes(uint16_t value, uint8_t bytes[2]) {
     bytes[1] = value & 0xFF;
 }
 
+uint32_t util::bytes_to_uint32(const uint8_t *bytes) {
+    // convert bytes to int first
+    const uint32_t result = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+    //std::memcpy(&reuslt, bytes, sizeof(result));
+
+    return result;
+}
+
+int32_t util::bytes_to_int32(const uint8_t *bytes) {
+    // convert bytes to int first
+    const uint32_t result = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+    //std::memcpy(&reuslt, bytes, sizeof(result));
+
+    return result;
+}
+

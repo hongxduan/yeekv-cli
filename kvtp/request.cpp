@@ -10,7 +10,7 @@
 
 #include "../util/byte_util.h"
 
-std::vector<uint8_t> kvtp::encodeRequest(InputData data) {
+std::vector<uint8_t> kvtp::encode_request(InputData data) {
     std::list<uint8_t> kvtp_bytes;
     std::vector<uint8_t> request;
 
