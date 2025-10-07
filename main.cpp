@@ -1,6 +1,12 @@
+//
+//
+//
+
+#include <bitset>
 #include <cstring>
 #include <iostream>
 #include <bit>
+#include <iterator>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -69,6 +75,29 @@ int main(int argc, char *argv[]) {
 }
 
 void printOS() {
+
+    /*
+    uint8_t bytes1[4], bytes2[4];
+    util::int32_to_le_bytes(5, bytes1);
+    util::int32_to_le_bytes(-5, bytes2);
+    std::cout << "bytes:" << bytes1 << std::endl;
+    std::cout << "bytes:" << bytes2 << std::endl;
+    std::cout << std::hex << 2 << std::endl;
+    std::cout << std::hex << -3 << std::endl;
+    */
+
+    /*
+    int32_t i = -32;
+    std::cout << i << " " <<std::hex << i << std::endl;
+    int32_t j = std::byteswap(i);
+    std::cout << std::dec << j << " " <<std::hex << j << std::endl;
+    uint8_t bytes[4];
+    util::int32_to_bytes(i, bytes);
+    std::cout<< std::hex<<std::to_integer<int>((std::byte)bytes[0])
+    <<std::to_integer<int>((std::byte)bytes[1])
+    <<std::to_integer<int>((std::byte)bytes[2])
+    <<std::to_integer<int>((std::byte)bytes[3]) <<std::endl;
+    */
     /*
     if constexpr (std::endian::native == std::endian::little) {
         std::cout << "little endian" << std::endl;

@@ -8,20 +8,19 @@
 
 
 namespace util {
+
+    void int32_to_bytes(int32_t value, uint8_t bytes[4]);
+
     //
     // convert uint32_t to byte array in Little Endian
     //
-    void uint32_to_le_bytes(uint32_t value, uint8_t bytes[4]);
+    void uint32_to_bytes(uint32_t value, uint8_t bytes[4]);
 
     //
     // convert uint16_t to byte array in Little Endian
     //
-    void uint16_to_le_bytes(uint16_t value, uint8_t bytes[2]);
+    void uint16_to_bytes(uint16_t value, uint8_t bytes[2]);
 
-    //
-    // convert Big Endian byte array to uint32_t
-    //
-    uint32_t convertBeBytesToUint32(const uint8_t bytes[4]);
 }
 
 #endif //YEEKV_CLI_BYTE_UTIL_H

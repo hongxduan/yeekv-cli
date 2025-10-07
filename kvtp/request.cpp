@@ -102,7 +102,7 @@ std::vector<uint8_t> kvtp::encodeRequest(InputData data) {
 
     // key length to byte[2]
     key_len = body_bytes.size();
-    util::uint16_to_le_bytes(key_len, key_len_bytes);
+    util::uint16_to_bytes(key_len, key_len_bytes);
 
     // push key length bytes in body bytes front
     body_bytes.push_front(key_len_bytes[1]);
@@ -125,7 +125,7 @@ std::vector<uint8_t> kvtp::encodeRequest(InputData data) {
     uint8_t len_bytes[4];
 
     //
-    util::uint32_to_le_bytes(request_len, len_bytes);
+    util::uint32_to_bytes(request_len, len_bytes);
     request.push_back(len_bytes[0]);
     request.push_back(len_bytes[1]);
     request.push_back(len_bytes[2]);
