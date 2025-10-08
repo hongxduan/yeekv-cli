@@ -14,6 +14,7 @@
 
 InputData parseInput(std::string input) {
     InputData data;
+    data.ttl = 0;
     std::vector<std::string> pieces;
 
     bool quoted = false; // check double-quoted or not during walk through input
@@ -80,7 +81,7 @@ InputData parseInput(std::string input) {
             data.cmd = util::toUpper(piece);
         } else {
             // process commands with KEY
-            if (data.cmd == "GET" || data.cmd == "GET" || data.cmd == "SET") {
+            if (data.cmd == "GET" || data.cmd == "SET" || data.cmd == "DEL") {
                 if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_NX) {
                     data.args.push_back(piece);
                 } else if (piece == ARG_TTL) {
