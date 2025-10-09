@@ -73,7 +73,6 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
         kvtp_bytes.push_back(LINE_FEED);
     }
 
-    std::cout << "ttl: "<< data.ttl << std::endl;
     if (data.ttl != "") {
         // TTL: line
         for (auto c: TTL_PREFIX) {
@@ -81,7 +80,7 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
                 kvtp_bytes.push_back(c);
             }
         }
-        std::cout << data.ttl << std::endl;
+
         for (auto c: data.ttl) {
             if (c != ZERO) {
                 kvtp_bytes.push_back(c);

@@ -114,7 +114,9 @@ InputData parse_input(std::string input) {
                             data.error = "invalid ttl";
                             return data;
                         }
-                    } else {
+                    } else if (data.cmd == GET) {
+                        // if GET key -ttl, then take ttl as args
+                        data.args.push_back(piece);
                         // For get key -ttl, the -ttl don't have value, just set 0
                         // -1: never expire
                         // -2: expired

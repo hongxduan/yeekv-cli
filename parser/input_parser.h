@@ -17,6 +17,11 @@
 #define ARG_DEL  "-d"
 #define ARG_TTL  "-ttl"
 
+#define GET "GET"
+#define SET "SET"
+#define DEL "DEL"
+#define KEY "KEY"
+
 #include <string>
 #include <vector>
 
