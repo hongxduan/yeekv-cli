@@ -86,7 +86,9 @@ InputData parse_input(std::string input) {
     while (i < pieces.size()) {
         std::string piece = pieces[i];
         if (i == 0) {
-            data.cmd = util::to_upper(piece);
+            data.cmd = util::to_upper(util::trim(piece));
+        } else if (i == 1) {
+            data.key = util::trim(piece);
         } else {
             // process commands with KEY
             if (data.cmd == "GET" || data.cmd == "SET" || data.cmd == "DEL") {
@@ -106,6 +108,9 @@ InputData parse_input(std::string input) {
                                     return data;
                                 }
                                 data.ttl = ttl_str;
+                                // i need forward one step, because consumed 2 pieces
+                                // piece 1: -ttl, piece 2: the ttl
+                                i++;
                             } catch (const std::invalid_argument &e) {
                                 data.error = "invalid ttl";
                                 return data;
@@ -121,12 +126,10 @@ InputData parse_input(std::string input) {
                         // -1: never expire
                         // -2: expired
                     }
+                } else if (data.value.size() == 0) {
+                    data.value = piece;
                 } else {
-                    if (data.key.size() == 0) {
-                        data.key = piece;
-                    } else if (data.value.size() == 0) {
-                        data.value = piece;
-                    }
+                    data.error = "invalid command format";
                 }
             }
             // Process commands without KEY
