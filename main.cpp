@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
         getline(std::cin, input);
 
         // parse input
-        InputData data = parseInput(input);
+        InputData data = parse_input(input);
         if (data.error.size() > 0) {
             std::cout << data.error << std::endl;
             continue;

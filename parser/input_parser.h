@@ -21,15 +21,16 @@
 #include <vector>
 
 struct InputData {
-    std::string error; // if has error
+    std::string error; // if it has error
     std::string cmd; // the command
     std::string key; // the key
     std::vector<std::string> args; // arguments
-    uint32_t ttl; // ttl
+    //uint32_t ttl; // ttl
+    std::string ttl;
     std::string value; // the value
 };
 
-InputData parseInput(std::string input);
+InputData parse_input(std::string input);
 
 
 #endif //YEEKV_CLI_INPUT_PARSE_H

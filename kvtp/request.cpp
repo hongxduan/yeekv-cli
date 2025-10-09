@@ -15,7 +15,7 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
     std::vector<uint8_t> request;
 
 
-    // protocal
+    // protocol
     for (auto c: PROTOCOL) {
         if (c != ZERO) {
             kvtp_bytes.push_back(c);
@@ -73,14 +73,16 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
         kvtp_bytes.push_back(LINE_FEED);
     }
 
-    if (data.ttl > 0) {
+    std::cout << "ttl: "<< data.ttl << std::endl;
+    if (data.ttl != "") {
         // TTL: line
         for (auto c: TTL_PREFIX) {
             if (c != ZERO) {
                 kvtp_bytes.push_back(c);
             }
         }
-        for (auto c: std::to_string(data.ttl)) {
+        std::cout << data.ttl << std::endl;
+        for (auto c: data.ttl) {
             if (c != ZERO) {
                 kvtp_bytes.push_back(c);
             }

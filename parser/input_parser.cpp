@@ -12,9 +12,16 @@
 
 #include "../util/string_util.h"
 
-InputData parseInput(std::string input) {
-    InputData data;
-    data.ttl = 0;
+InputData parse_input(std::string input) {
+    InputData data{
+        "",
+        "",
+        "",
+        {},
+        "",
+        ""
+    };
+
     std::vector<std::string> pieces;
 
     bool quoted = false; // check double-quoted or not during walk through input
@@ -50,14 +57,15 @@ InputData parseInput(std::string input) {
                         piece = input.substr(si, ei - si);
                     }
                 }
+                piece = util::trim(piece);
                 if (piece.size() > 0) {
                     // remove the leading and trailing Double Quote
                     if (piece[0] == DQUOTE_CHAR) {
                         piece = piece.substr(1, piece.size() - 2);
                     }
+                    pieces.push_back(piece);
                 }
                 //std::cout << piece << std::endl;
-                pieces.push_back(piece);
                 si = i + 1;
             }
         } else if (cur == DQUOTE_CHAR) {
@@ -78,7 +86,7 @@ InputData parseInput(std::string input) {
     while (i < pieces.size()) {
         std::string piece = pieces[i];
         if (i == 0) {
-            data.cmd = util::toUpper(piece);
+            data.cmd = util::to_upper(piece);
         } else {
             // process commands with KEY
             if (data.cmd == "GET" || data.cmd == "SET" || data.cmd == "DEL") {
@@ -88,7 +96,16 @@ InputData parseInput(std::string input) {
                     if (data.cmd == "SET") {
                         if (i + 1 < pieces.size()) {
                             try {
-                                data.ttl = std::stoi(pieces[i + 1]);
+                                auto ttl_str = util::trim(pieces[i + 1]);
+                                // validate ttl:
+                                //  ttl must be a positive number
+                                //  ttl cannot be 0 or negative number
+                                auto ttl = std::stoll(ttl_str);
+                                if (ttl <= 0) {
+                                    data.error = "ttl must be greater than zero";
+                                    return data;
+                                }
+                                data.ttl = ttl_str;
                             } catch (const std::invalid_argument &e) {
                                 data.error = "invalid ttl";
                                 return data;
@@ -101,7 +118,6 @@ InputData parseInput(std::string input) {
                         // For get key -ttl, the -ttl don't have value, just set 0
                         // -1: never expire
                         // -2: expired
-                        data.ttl = 0;
                     }
                 } else {
                     if (data.key.size() == 0) {

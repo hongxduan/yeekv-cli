@@ -7,7 +7,13 @@
 #include <string>
 
 namespace util {
-    std::string toUpper(std::string str);
+    std::string to_upper(std::string str);
+
+    std::string trim_left(const std::string &str);
+
+    std::string trim_right(const std::string &str);
+
+    std::string trim(const std::string &str);
 }
 
 
