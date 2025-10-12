@@ -8,14 +8,15 @@
 #define YEEKV_CLI_INPUT_PARSE_H
 
 
-#define SPACE_CHAR  ' '
-#define DQUOTE_CHAR  '"'
-#define BSLASH_CHAR  '\\'
+#define SPACE_CHAR      ' '
+#define DQUOTE_CHAR     '"'
+#define BSLASH_CHAR     '\\'
 
 #define ARG_EX  "-ex"
 #define ARG_NX  "-nx"
-#define ARG_DEL  "-del"
-#define ARG_TTL  "-ttl"
+#define ARG_DEL "-del"
+#define ARG_TTL "-ttl"
+#define ARG_INC "-inc"
 
 #define GET "GET"
 #define SET "SET"
@@ -32,6 +33,7 @@ struct InputData {
     std::vector<std::string> args; // arguments
     //uint32_t ttl; // ttl
     std::string ttl;
+    std::string inc;
     std::string value; // the value
 };
 

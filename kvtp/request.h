@@ -18,6 +18,7 @@
 #define CMD_PREFIX "CMD:"
 #define ARG_PREFIX "ARGS:"
 #define TTL_PREFIX "TTL:"
+#define INC_PREFIX "INC:"
 
 namespace kvtp {
     // encode user input command to KVTP request

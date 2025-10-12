@@ -89,6 +89,22 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
         kvtp_bytes.push_back(LINE_FEED);
     }
 
+    if (data.inc != "") {
+        // TTL: line
+        for (auto c: INC_PREFIX) {
+            if (c != ZERO) {
+                kvtp_bytes.push_back(c);
+            }
+        }
+
+        for (auto c: data.inc) {
+            if (c != ZERO) {
+                kvtp_bytes.push_back(c);
+            }
+        }
+        kvtp_bytes.push_back(LINE_FEED);
+    }
+
     // empty line
     kvtp_bytes.push_back(LINE_FEED);
 

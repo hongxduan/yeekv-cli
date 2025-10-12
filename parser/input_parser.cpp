@@ -19,6 +19,7 @@ InputData parse_input(std::string input) {
         "",
         {},
         "",
+        "",
         ""
     };
 
@@ -85,6 +86,7 @@ InputData parse_input(std::string input) {
     int i = 0;
     while (i < pieces.size()) {
         std::string piece = pieces[i];
+        std::cout << piece << std::endl;
         if (i == 0) {
             data.cmd = util::to_upper(util::trim(piece));
         } else if (i == 1) {
@@ -124,7 +126,29 @@ InputData parse_input(std::string input) {
                         data.args.push_back(piece);
                         // For get key -ttl, the -ttl don't have value, just set 0
                         // -1: never expire
-                        // -2: expired
+                    }
+                } else if (piece == ARG_INC) {
+                    if (i + 1 < pieces.size()) {
+                        try {
+                            std::cout << "data.inc" << util::trim(pieces[i + 1]) << std::endl;
+                            auto inc_str = util::trim(pieces[i + 1]);
+                            auto inc = std::stoll(inc_str);
+                            if (inc == 0) {
+                                data.error = "INC value cannot be 0";
+                                return data;
+                            }
+                            data.inc = inc_str;
+                            std::cout << "data.inc" << data.inc << std::endl;
+                            // i need forward one step, because consumed 2 pieces
+                            // piece 1: -inc, piece 2: the inc number
+                            i++;
+                        } catch (const std::invalid_argument &e) {
+                            data.error = "INC value must be a number";
+                            return data;
+                        }
+                    } else {
+                        data.error = "INC value must be a number";
+                        return data;
                     }
                 } else if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_NX) {
                     data.args.push_back(piece);
