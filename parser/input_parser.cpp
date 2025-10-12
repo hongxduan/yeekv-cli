@@ -126,6 +126,8 @@ InputData parse_input(std::string input) {
                         // -1: never expire
                         // -2: expired
                     }
+                } else if (piece == ARG_DEL) {
+                    data.args.push_back(piece);
                 } else if (data.value.size() == 0) {
                     data.value = piece;
                 } else {

@@ -14,7 +14,7 @@
 
 #define ARG_EX  "-ex"
 #define ARG_NX  "-nx"
-#define ARG_DEL  "-d"
+#define ARG_DEL  "-del"
 #define ARG_TTL  "-ttl"
 
 #define GET "GET"
