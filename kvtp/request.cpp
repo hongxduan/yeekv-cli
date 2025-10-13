@@ -108,23 +108,25 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
     // empty line
     kvtp_bytes.push_back(LINE_FEED);
 
-    /**************body start*****************/
+    ///
+    /// encode body
+    ///
     std::list<uint8_t> body_bytes;
-    uint16_t key_len;
-    uint8_t key_len_bytes[2];
+    //uint16_t key_len;
+    //uint8_t key_len_bytes[2];
 
-    //push key bytes
-    for (auto c: data.key) {
-        body_bytes.push_back(c);
-    }
+    ////push key bytes
+    //for (auto c: data.key) {
+    //    body_bytes.push_back(c);
+    //}
 
-    // key length to byte[2]
-    key_len = body_bytes.size();
-    util::uint16_to_bytes(key_len, key_len_bytes);
+    //// key length to byte[2]
+    //key_len = body_bytes.size();
+    //util::uint16_to_bytes(key_len, key_len_bytes);
 
-    // push key length bytes in body bytes front
-    body_bytes.push_front(key_len_bytes[1]);
-    body_bytes.push_front(key_len_bytes[0]);
+    //// push key length bytes in body bytes front
+    //body_bytes.push_front(key_len_bytes[1]);
+    //body_bytes.push_front(key_len_bytes[0]);
 
     // push value bytes
     for (auto c: data.value) {
@@ -132,7 +134,6 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
             body_bytes.push_back(c);
         }
     }
-    /**************body end*****************/
 
     kvtp_bytes.append_range(body_bytes);
 
