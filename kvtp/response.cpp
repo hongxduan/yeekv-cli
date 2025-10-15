@@ -53,6 +53,12 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
         line_num++;
     }
 
+    // body is empty
+    if (header_size > raw_res.size()) {
+        std::cout << status << ":" << std::endl;
+        return;
+    }
+
     //
     // decode body
     //
@@ -77,6 +83,26 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
     } else if (data_type == RES_DT_LL) {
     } else if (data_type == RES_DT_LD) {
     } else if (data_type == RES_DT_LS) {
+        int read = 0;
+        int idx = 0;
+        while (read < body_bytes.size()) {
+            // read item length
+            uint8_t len_bytes[4];
+            std::copy(body_bytes.begin() + read, body_bytes.begin() + read + 4, len_bytes);
+            read += 4;
+            auto len = util::bytes_to_int32(len_bytes);
+            if (read + len > body_bytes.size()) {
+                std::cout << "ERR:" << "DATA_ERR" << std::endl;
+            }
+            // read item
+            uint8_t bytes[len];
+            std::copy(body_bytes.begin() + read, body_bytes.begin() + read + len, bytes);
+            read += len;
+            auto val = std::string(bytes, bytes + len);
+            ++idx;
+            // print
+            std::cout << idx << ":" << val << std::endl;
+        }
     } else if (data_type == RES_DT_M) {
     } else {
         // error type
