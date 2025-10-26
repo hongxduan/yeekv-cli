@@ -22,6 +22,7 @@
 #define SET "SET"
 #define DEL "DEL"
 #define KEY "KEY"
+#define RESHARD "RESHARD"
 
 #include <string>
 #include <vector>
@@ -37,7 +38,18 @@ struct InputData {
     std::string value; // the value
 };
 
+/// Parse user input to InputData
+/// @param input
+/// @return
 InputData parse_input(std::string input);
+
+/// Parse command that has KEY
+void parse_key_input(std::vector<std::string> pieces, InputData &data);
+
+/// Parse command that has NO KEY
+void parse_nonkey_input(std::vector<std::string> pieces, InputData &data);
+
+bool is_key_command(std::string cmd);
 
 
 #endif //YEEKV_CLI_INPUT_PARSE_H

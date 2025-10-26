@@ -1,0 +1,7 @@
+# Run repart command from any Manager node
+# To create of update partitions
+# > reshard -f partition.cnf
+
+#partitions
+partition.1=localhost:8305, localhost:8306
+partition.2=localhost:8307, localhost:8308

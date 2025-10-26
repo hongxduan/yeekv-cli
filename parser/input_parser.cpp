@@ -3,13 +3,12 @@
 //
 
 
+#include <fstream>
+#include <iostream>
+#include <ostream>
 #include <vector>
 
 #include "input_parser.h"
-
-#include <iostream>
-#include <ostream>
-
 #include "../util/string_util.h"
 
 InputData parse_input(std::string input) {
@@ -83,16 +82,25 @@ InputData parse_input(std::string input) {
         std::cout  << pieces[i]  << std::endl;
     }*/
 
-    int i = 0;
+    data.cmd = util::to_upper(util::trim(pieces[0]));
+    if (is_key_command(data.cmd)) {
+        parse_key_input(pieces, data);
+    } else {
+        parse_nonkey_input(pieces, data);
+    }
+
+    return data;
+}
+
+void parse_key_input(std::vector<std::string> pieces, InputData &data) {
+    int i = 1;
     while (i < pieces.size()) {
         std::string piece = pieces[i];
-        if (i == 0) {
-            data.cmd = util::to_upper(util::trim(piece));
-        } else if (i == 1) {
+        if (i == 1) {
             data.key = util::trim(piece);
         } else {
             // process commands with KEY
-            if (data.cmd == "GET" || data.cmd == "SET" || data.cmd == "DEL") {
+            if (data.cmd == GET || data.cmd == SET || data.cmd == DEL) {
                 if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_NX) {
                     data.args.push_back(piece);
                 } else if (piece == ARG_TTL) {
@@ -106,7 +114,7 @@ InputData parse_input(std::string input) {
                                 auto ttl = std::stoll(ttl_str);
                                 if (ttl <= 0) {
                                     data.error = "ttl must be greater than zero";
-                                    return data;
+                                    return;
                                 }
                                 data.ttl = ttl_str;
                                 // i need forward one step, because consumed 2 pieces
@@ -114,11 +122,11 @@ InputData parse_input(std::string input) {
                                 i++;
                             } catch (const std::invalid_argument &e) {
                                 data.error = "invalid ttl";
-                                return data;
+                                return;
                             }
                         } else {
                             data.error = "invalid ttl";
-                            return data;
+                            return;
                         }
                     } else if (data.cmd == GET) {
                         // if GET key -ttl, then take ttl as args
@@ -133,7 +141,7 @@ InputData parse_input(std::string input) {
                             auto inc = std::stoll(inc_str);
                             if (inc == 0) {
                                 data.error = "INC value cannot be 0";
-                                return data;
+                                return;
                             }
                             data.inc = inc_str;
                             // i need forward one step, because consumed 2 pieces
@@ -141,11 +149,11 @@ InputData parse_input(std::string input) {
                             i++;
                         } catch (const std::invalid_argument &e) {
                             data.error = "INC value must be a number";
-                            return data;
+                            return;
                         }
                     } else {
                         data.error = "INC value must be a number";
-                        return data;
+                        return;
                     }
                 } else if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_NX) {
                     data.args.push_back(piece);
@@ -154,13 +162,47 @@ InputData parse_input(std::string input) {
                 } else {
                     data.error = "invalid command format";
                 }
-            }
-            // Process commands without KEY
-            else {
+            } else {
             }
         }
         i++;
     }
+}
 
-    return data;
+void parse_nonkey_input(std::vector<std::string> pieces, InputData &data) {
+    int i = 1;
+    while (i < pieces.size()) {
+        // RESHARD
+        // Format: reshard -f xxxx.txt
+        if (data.cmd == RESHARD) {
+            if (i == 1) {
+                if (pieces[i] != "-f") {
+                    data.error = "invalid command format";
+                    return;
+                }
+            } else if (i == 2) {
+                auto filename = util::trim(pieces[i]);
+                if (!std::filesystem::exists(filename)) {
+                    data.error = std::format("file {} not found", filename);
+                }
+                std::ifstream file(filename);
+                std::string line;
+                while (getline(file, line)) {
+                    // Trim and ignore comments
+                    util::trim(line);
+                    if (line.starts_with("#")) {
+                        continue;
+                    }
+                    data.value.append(line);
+                }
+                return;
+            }
+        }
+        ++i;
+    }
+}
+
+
+bool is_key_command(std::string cmd) {
+    return cmd == GET || cmd == SET || cmd == DEL || cmd == KEY;
 }

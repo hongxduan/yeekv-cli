@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
     inet_pton(AF_INET, host.c_str(), &server_addr.sin_addr);
 
     // sending connection request
-    connect(client_sock, (struct sockaddr *) &server_addr, sizeof(server_addr));
+    connect(client_sock, reinterpret_cast<struct sockaddr *>(&server_addr), sizeof(server_addr));
 
     // command line input
     std::string input;

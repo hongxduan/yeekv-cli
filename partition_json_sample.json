@@ -1,0 +1,18 @@
+{
+  "partitions": [
+    {
+      "id": "a",
+      "hosts": [
+        "localhost:8305",
+        "localhost:8306"
+      ]
+    },
+    {
+      "id": "b",
+      "hosts": [
+        "localhost:8307",
+        "localhost:8308"
+      ]
+    }
+  ]
+}
