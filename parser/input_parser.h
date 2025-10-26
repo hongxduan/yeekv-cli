@@ -18,10 +18,14 @@
 #define ARG_TTL "-ttl"
 #define ARG_INC "-inc"
 
+// For shard use
+#define ARG_ID "-id"
+
 #define GET "GET"
 #define SET "SET"
 #define DEL "DEL"
 #define KEY "KEY"
+#define SHARD "SHARD"
 #define RESHARD "RESHARD"
 
 #include <string>
@@ -35,6 +39,7 @@ struct InputData {
     //uint32_t ttl; // ttl
     std::string ttl;
     std::string inc;
+    std::string id; // for shard command
     std::string value; // the value
 };
 
@@ -47,6 +52,9 @@ InputData parse_input(std::string input);
 void parse_key_input(std::vector<std::string> pieces, InputData &data);
 
 /// Parse command that has NO KEY
+/// The KEY head may use to store sub command
+/// @param pieces
+/// @param data
 void parse_nonkey_input(std::vector<std::string> pieces, InputData &data);
 
 bool is_key_command(std::string cmd);

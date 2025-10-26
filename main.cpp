@@ -16,6 +16,7 @@
 #include "kvtp/response.h"
 #include "parser/input_parser.h"
 #include "util/byte_util.h"
+#include "util/string_util.h"
 
 #define PROMPT "yeekv> "
 
@@ -55,6 +56,11 @@ int main(int argc, char *argv[]) {
     while (true) {
         std::cout << PROMPT;
         getline(std::cin, input);
+
+        util::trim(input);
+        if (input.empty()) {
+            continue;
+        }
 
         // parse input
         InputData data = parse_input(input);

@@ -172,6 +172,55 @@ void parse_key_input(std::vector<std::string> pieces, InputData &data) {
 void parse_nonkey_input(std::vector<std::string> pieces, InputData &data) {
     int i = 1;
     while (i < pieces.size()) {
+        if (data.cmd == SHARD) {
+            // New shard
+            if (util::to_upper(pieces[i]) == "-NEW") {
+                data.key = "NEW";
+                if (i + 1 < pieces.size()) {
+                    // todo: validate ip and port
+                    data.value = pieces[i + 1];
+                } else {
+                    data.error = std::format("Missing ip:port");
+                }
+                i++;
+            }
+            // Remove shard
+            else if (util::to_upper(pieces[i]) == "-RM") {
+                data.key = "RM";
+                if (i + 1 < pieces.size()) {
+                    // the shard id
+                    data.value = pieces[i + 1];
+                } else {
+                    data.error = std::format("Missing shard id");
+                }
+                i++;
+            }
+            // Add worker to shard
+            else if (util::to_upper(pieces[i]) == "-ADD-WRK") {
+                data.key = "ADD-WRK";
+                if (i + 1 < pieces.size()) {
+                    // todo: validate ip and port
+                    data.value = pieces[i + 1];
+                } else {
+                    data.error = std::format("Missing ip:port");
+                }
+                i++;
+            }
+            // shard -id shard_id -add-wrk ip:port
+            else if (util::to_upper(pieces[i]) == "-ID") {
+                // store id as value
+                if (i + 1 < pieces.size()) {
+                    data.id = pieces[i + 1];
+                } else {
+                    data.error = std::format("Missing id");
+                }
+                i++;
+            } else {
+                std::cout << pieces[i] << std::endl;
+                data.error = std::format("Invalid argument");
+            }
+        }
+        /*
         // RESHARD
         // Format: reshard -f xxxx.txt
         if (data.cmd == RESHARD) {
@@ -197,7 +246,7 @@ void parse_nonkey_input(std::vector<std::string> pieces, InputData &data) {
                 }
                 return;
             }
-        }
+        }*/
         ++i;
     }
 }
