@@ -28,10 +28,10 @@ InputData parse_input(std::string input) {
     uint si = 0; // start index
     uint ei = 0; // end index
 
-    char pre, cur;
-    uint len = input.size();
+    char pre;
+    const uint len = input.size();
     for (uint i = 0; i < len; i++) {
-        cur = input[i];
+        const char cur = input[i];
         // meet space
         if (cur == SPACE_CHAR || i == len - 1) {
             ei = i;
@@ -58,7 +58,7 @@ InputData parse_input(std::string input) {
                     }
                 }
                 piece = util::trim(piece);
-                if (piece.size() > 0) {
+                if (!piece.empty()) {
                     // remove the leading and trailing Double Quote
                     if (piece[0] == DQUOTE_CHAR) {
                         piece = piece.substr(1, piece.size() - 2);
@@ -95,7 +95,7 @@ InputData parse_input(std::string input) {
 void parse_key_input(std::vector<std::string> pieces, InputData &data) {
     int i = 1;
     while (i < pieces.size()) {
-        std::string piece = pieces[i];
+        const std::string& piece = pieces[i];
         if (i == 1) {
             data.key = util::trim(piece);
         } else {
@@ -218,6 +218,11 @@ void parse_nonkey_input(std::vector<std::string> pieces, InputData &data) {
             } else {
                 std::cout << pieces[i] << std::endl;
                 data.error = std::format("Invalid argument");
+            }
+        } else if (data.cmd == INFO) {
+            if (util::to_upper(pieces[i]) == "-SHARD") {
+                data.key = "SHARD";
+                i++;
             }
         }
         /*

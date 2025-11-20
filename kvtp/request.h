@@ -19,10 +19,11 @@
 #define ARG_PREFIX "ARGS:"
 #define TTL_PREFIX "TTL:"
 #define INC_PREFIX "INC:"
+#define ID_PREFIX "ID:" // shard id
 
 namespace kvtp {
     // encode user input command to KVTP request
-    std::vector<uint8_t> encode_request(InputData data);
+    std::vector<uint8_t> encode_request(const InputData &data);
 }
 
 

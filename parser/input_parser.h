@@ -25,6 +25,7 @@
 #define SET "SET"
 #define DEL "DEL"
 #define KEY "KEY"
+#define INFO "INFO"
 #define SHARD "SHARD"
 #define RESHARD "RESHARD"
 

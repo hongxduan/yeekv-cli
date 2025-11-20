@@ -10,27 +10,18 @@
 
 #include "../util/byte_util.h"
 
-std::vector<uint8_t> kvtp::encode_request(InputData data) {
+std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
     std::list<uint8_t> kvtp_bytes;
     std::vector<uint8_t> request;
 
-
-    // protocol
-    for (auto c: PROTOCOL) {
-        if (c != ZERO) {
-            kvtp_bytes.push_back(c);
-        }
-    }
+    // Protocol
+    // Cast the #define string to string is to remove trailing \0 char
+    kvtp_bytes.append_range(static_cast<std::string>(PROTOCOL));
     kvtp_bytes.push_back(LINE_FEED);
 
     // CMD: line
-    for (auto c: CMD_PREFIX) {
-        if (c != ZERO) {
-            kvtp_bytes.push_back(c);
-        }
-    }
-
-    for (auto c: data.cmd) {
+    kvtp_bytes.append_range(static_cast<std::string>(CMD_PREFIX));
+    for (const auto c: data.cmd) {
         if (c != ZERO) {
             kvtp_bytes.push_back(c);
         }
@@ -38,12 +29,7 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
     kvtp_bytes.push_back(LINE_FEED);
 
     // KEY: line
-    for (auto c: KEY_PREFIX) {
-        if (c != ZERO) {
-            kvtp_bytes.push_back(c);
-        }
-    }
-
+    kvtp_bytes.append_range(static_cast<std::string>(KEY_PREFIX));
     for (auto c: data.key) {
         if (c != ZERO) {
             kvtp_bytes.push_back(c);
@@ -52,15 +38,11 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
     kvtp_bytes.push_back(LINE_FEED);
 
     // ARGS: line
-    if (data.args.size() > 0) {
-        for (auto c: ARG_PREFIX) {
-            if (c != ZERO) {
-                kvtp_bytes.push_back(c);
-            }
-        }
+    if (!data.args.empty()) {
+        kvtp_bytes.append_range(static_cast<std::string>(ARG_PREFIX));
 
-        for (auto arg: data.args) {
-            for (auto c: arg) {
+        for (const auto &arg: data.args) {
+            for (const auto c: arg) {
                 if (c != ZERO) {
                     kvtp_bytes.push_back(c);
                 }
@@ -73,13 +55,9 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
         kvtp_bytes.push_back(LINE_FEED);
     }
 
-    if (data.ttl != "") {
+    if (!data.ttl.empty()) {
         // TTL: line
-        for (auto c: TTL_PREFIX) {
-            if (c != ZERO) {
-                kvtp_bytes.push_back(c);
-            }
-        }
+        kvtp_bytes.append_range(static_cast<std::string>(TTL_PREFIX));
 
         for (auto c: data.ttl) {
             if (c != ZERO) {
@@ -89,15 +67,11 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
         kvtp_bytes.push_back(LINE_FEED);
     }
 
-    if (data.inc != "") {
-        // TTL: line
-        for (auto c: INC_PREFIX) {
-            if (c != ZERO) {
-                kvtp_bytes.push_back(c);
-            }
-        }
+    if (!data.inc.empty()) {
+        // INC: line
+        kvtp_bytes.append_range(static_cast<std::string>(INC_PREFIX));
 
-        for (auto c: data.inc) {
+        for (const auto c: data.inc) {
             if (c != ZERO) {
                 kvtp_bytes.push_back(c);
             }
@@ -105,7 +79,18 @@ std::vector<uint8_t> kvtp::encode_request(InputData data) {
         kvtp_bytes.push_back(LINE_FEED);
     }
 
-    // empty line
+    // -id for shard command
+    // shard -id shard_id
+    if (!data.id.empty()) {
+        // ID: line
+        kvtp_bytes.append_range(static_cast<std::string>(ID_PREFIX));
+        for (const auto c: data.id) {
+            kvtp_bytes.push_back(c);
+        }
+        kvtp_bytes.push_back(LINE_FEED);
+    }
+
+    // Empty line: header body separator
     kvtp_bytes.push_back(LINE_FEED);
 
     ///

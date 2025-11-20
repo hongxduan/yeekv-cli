@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
 
         // parse input
         InputData data = parse_input(input);
-        if (data.error.size() > 0) {
+        if (!data.error.empty()) {
             std::cout << data.error << std::endl;
             continue;
         }
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
         std::vector<uint8_t> response;
         do {
             memset(buffer, 0, bufsize);
-            n = read(client_sock, buffer, bufsize);
+            n = read(client_sock, buffer, len - total_n);
             if (n == 0) {
                 std::cout << "server closed connection" << std::endl;
                 break;
