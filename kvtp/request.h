@@ -4,10 +4,10 @@
 
 #ifndef YEEKV_CLI_KVTPREQUEST_H
 #define YEEKV_CLI_KVTPREQUEST_H
-#include <vector>
-
 #include "../parser/input_parser.h"
 
+#include <cinttypes>
+#include <vector>
 
 #define ZERO '\0'
 

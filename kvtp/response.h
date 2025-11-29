@@ -4,6 +4,7 @@
 
 #ifndef YEEKV_CLI_KVTPRESPONSE_H
 #define YEEKV_CLI_KVTPRESPONSE_H
+#include <cinttypes>
 #include <vector>
 
 // response data type define
