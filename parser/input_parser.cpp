@@ -1,7 +1,9 @@
 //
-// Created by HongXing on 1/10/25.
+// author: Duan Hongxing
+// Copyright(c) 2025 Duan Hongxing, hongxduan@gmail.com
 //
-
+// Input Parser implement
+//
 
 #include <fstream>
 #include <iostream>
@@ -92,13 +94,24 @@ InputData parse_input(std::string input) {
     return data;
 }
 
-void parse_key_input(std::vector<std::string> pieces, InputData &data) {
+void parse_key_input(const std::vector<std::string>& pieces, InputData& data) {
     int i = 1;
     while (i < pieces.size()) {
         const std::string& piece = pieces[i];
         if (i == 1) {
             data.key = util::trim(piece);
         } else {
+            if (data.cmd == GET) {
+            } else if (data.cmd == SET) {
+            } else if (data.cmd == LGET) {
+            } else if (data.cmd == LSET) {
+            } else if (data.cmd == HGET) {
+            } else if (data.cmd == HSET) {
+            } else if (data.cmd == SGET) {
+            } else if (data.cmd == SSET) {
+            } else if (data.cmd == OGET) {
+            } else if (data.cmd == OSET) {
+            }
             // process commands with KEY
             if (data.cmd == GET || data.cmd == SET || data.cmd == DEL) {
                 if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_NX) {
@@ -120,7 +133,7 @@ void parse_key_input(std::vector<std::string> pieces, InputData &data) {
                                 // i need forward one step, because consumed 2 pieces
                                 // piece 1: -ttl, piece 2: the ttl
                                 i++;
-                            } catch (const std::invalid_argument &e) {
+                            } catch (const std::invalid_argument& e) {
                                 data.error = "invalid ttl";
                                 return;
                             }
@@ -147,7 +160,7 @@ void parse_key_input(std::vector<std::string> pieces, InputData &data) {
                             // i need forward one step, because consumed 2 pieces
                             // piece 1: -inc, piece 2: the inc number
                             i++;
-                        } catch (const std::invalid_argument &e) {
+                        } catch (const std::invalid_argument& e) {
                             data.error = "INC value must be a number";
                             return;
                         }
@@ -169,7 +182,7 @@ void parse_key_input(std::vector<std::string> pieces, InputData &data) {
     }
 }
 
-void parse_nonkey_input(std::vector<std::string> pieces, InputData &data) {
+void parse_nonkey_input(const std::vector<std::string>& pieces, InputData& data) {
     int i = 1;
     while (i < pieces.size()) {
         if (data.cmd == SHARD) {
