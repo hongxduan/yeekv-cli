@@ -5,13 +5,15 @@
 // Input Parser implement
 //
 
+#include "input_parser.h"
+#include "../util/string_util.h"
+
 #include <fstream>
 #include <iostream>
 #include <ostream>
 #include <vector>
 
-#include "input_parser.h"
-#include "../util/string_util.h"
+using namespace std;
 
 InputData parse_input(std::string input) {
     InputData data{
@@ -95,92 +97,199 @@ InputData parse_input(std::string input) {
 }
 
 void parse_key_input(const std::vector<std::string>& pieces, InputData& data) {
+    if (data.cmd == GET) {
+        parse_get(pieces, data);
+    } else if (data.cmd == SET) {
+        parse_set(pieces, data);
+    } else if (data.cmd == LGET) {
+        parse_lget(pieces, data);
+    } else if (data.cmd == LSET) {
+        parse_lset(pieces, data);
+    } else if (data.cmd == HGET) {
+        parse_hget(pieces, data);
+    } else if (data.cmd == HSET) {
+        parse_hset(pieces, data);
+    } else if (data.cmd == SGET) {
+        parse_sget(pieces, data);
+    } else if (data.cmd == SSET) {
+        parse_sset(pieces, data);
+    } else if (data.cmd == OGET) {
+        parse_oget(pieces, data);
+    } else if (data.cmd == OSET) {
+        parse_oset(pieces, data);
+    }
+}
+
+void parse_get(const std::vector<std::string>& pieces, InputData& data) {
     int i = 1;
     while (i < pieces.size()) {
         const std::string& piece = pieces[i];
         if (i == 1) {
             data.key = util::trim(piece);
         } else {
-            if (data.cmd == GET) {
-            } else if (data.cmd == SET) {
-            } else if (data.cmd == LGET) {
-            } else if (data.cmd == LSET) {
-            } else if (data.cmd == HGET) {
-            } else if (data.cmd == HSET) {
-            } else if (data.cmd == SGET) {
-            } else if (data.cmd == SSET) {
-            } else if (data.cmd == OGET) {
-            } else if (data.cmd == OSET) {
-            }
             // process commands with KEY
-            if (data.cmd == GET || data.cmd == SET || data.cmd == DEL) {
-                if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_NX) {
-                    data.args.push_back(piece);
-                } else if (piece == ARG_TTL) {
-                    if (data.cmd == "SET") {
-                        if (i + 1 < pieces.size()) {
-                            try {
-                                auto ttl_str = util::trim(pieces[i + 1]);
-                                // validate ttl:
-                                //  ttl must be a positive number
-                                //  ttl cannot be 0 or negative number
-                                auto ttl = std::stoll(ttl_str);
-                                if (ttl <= 0) {
-                                    data.error = "ttl must be greater than zero";
-                                    return;
-                                }
-                                data.ttl = ttl_str;
-                                // i need forward one step, because consumed 2 pieces
-                                // piece 1: -ttl, piece 2: the ttl
-                                i++;
-                            } catch (const std::invalid_argument& e) {
-                                data.error = "invalid ttl";
-                                return;
-                            }
-                        } else {
-                            data.error = "invalid ttl";
-                            return;
-                        }
-                    } else if (data.cmd == GET) {
-                        // if GET key -ttl, then take ttl as args
-                        data.args.push_back(piece);
-                        // For get key -ttl, the -ttl don't have value, just set 0
-                        // -1: never expire
-                    }
-                } else if (piece == ARG_INC) {
-                    if (i + 1 < pieces.size()) {
-                        try {
-                            auto inc_str = util::trim(pieces[i + 1]);
-                            auto inc = std::stoll(inc_str);
-                            if (inc == 0) {
-                                data.error = "INC value cannot be 0";
-                                return;
-                            }
-                            data.inc = inc_str;
-                            // i need forward one step, because consumed 2 pieces
-                            // piece 1: -inc, piece 2: the inc number
-                            i++;
-                        } catch (const std::invalid_argument& e) {
-                            data.error = "INC value must be a number";
-                            return;
-                        }
-                    } else {
-                        data.error = "INC value must be a number";
-                        return;
-                    }
-                } else if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_NX) {
-                    data.args.push_back(piece);
-                } else if (data.value.size() == 0) {
-                    data.value = piece;
-                } else {
-                    data.error = "invalid command format";
-                }
+            if (piece == ARG_DEL) {
+                data.args.push_back(piece);
+            } else if (piece == ARG_TTL) {
+                // if GET key -ttl, then take ttl as args
+                data.args.push_back(piece);
+                // For get key -ttl, the -ttl don't have value, just set 0
+                // -1: never expire
             } else {
+                data.error = "invalid command format";
             }
         }
         i++;
     }
 }
+
+void parse_set(const std::vector<std::string>& pieces, InputData& data) {
+    int i = 1;
+    while (i < pieces.size()) {
+        const std::string& piece = pieces[i];
+        if (i == 1) {
+            data.key = util::trim(piece);
+        } else {
+            // process commands with KEY
+            if (piece == ARG_EX || piece == ARG_NX) {
+                data.args.push_back(piece);
+            } else if (piece == ARG_TTL) {
+                if (i + 1 < pieces.size()) {
+                    try {
+                        auto ttl_str = util::trim(pieces[i + 1]);
+                        // validate ttl:
+                        //  ttl must be a positive number
+                        //  ttl cannot be 0 or negative number
+                        auto ttl = std::stoll(ttl_str);
+                        if (ttl <= 0) {
+                            data.error = "ttl must be greater than zero";
+                            return;
+                        }
+                        data.ttl = ttl_str;
+                        // i need forward one step, because consumed 2 pieces
+                        // piece 1: -ttl, piece 2: the ttl
+                        i++;
+                    } catch (const std::invalid_argument& e) {
+                        data.error = "invalid ttl";
+                        return;
+                    }
+                } else {
+                    data.error = "invalid ttl";
+                    return;
+                }
+            } else if (piece == ARG_INC) {
+                if (i + 1 < pieces.size()) {
+                    try {
+                        auto inc_str = util::trim(pieces[i + 1]);
+                        auto inc = std::stoll(inc_str);
+                        if (inc == 0) {
+                            data.error = "INC value cannot be 0";
+                            return;
+                        }
+                        data.inc = inc_str;
+                        // i need forward one step, because consumed 2 pieces
+                        // piece 1: -inc, piece 2: the inc number
+                        i++;
+                    } catch (const std::invalid_argument& e) {
+                        data.error = "INC value must be a number";
+                        return;
+                    }
+                } else {
+                    data.error = "INC value must be a number";
+                    return;
+                }
+            } else if (data.value.size() == 0) {
+                data.value = piece;
+            } else {
+                data.error = "invalid command format";
+            }
+        }
+        i++;
+    }
+}
+
+void parse_hget(const std::vector<std::string>& pieces, InputData& data) {
+}
+
+void parse_hset(const std::vector<std::string>& pieces, InputData& data) {
+}
+
+void parse_lget(const std::vector<std::string>& pieces, InputData& data) {
+    // Examples:
+    // LGET users 0
+    // LGET users #
+    // LGET users &tom
+    // LGET users 0..-1
+    // LGET users ..
+    // LGET users 0 -del
+
+    int i = 1;
+    while (i < pieces.size()) {
+        const std::string& piece = pieces[i];
+        if (i == 1) {
+            data.key = util::trim(piece);
+        } else if (i == 2) {
+            // Index
+            data.id = util::trim(piece);
+        } else if (piece == ARG_DEL) {
+            data.args.push_back(piece);
+        } else {
+            data.error = "invalid command format";
+        }
+
+        i++;
+    }
+}
+
+void parse_lset(const std::vector<std::string>& pieces, InputData& data) {
+    //Examples:
+    // LSET users 0 tom
+    // LSET users -1 jerry
+    int i = 1;
+    while (i < pieces.size()) {
+        const std::string& piece = pieces[i];
+        if (i == 1) {
+            data.key = util::trim(piece);
+        } else if (i == 2) {
+            // Index
+            data.id = util::trim(piece);
+        } else if (i == 3) {
+            data.value = util::trim(piece);
+        } else {
+            if (piece == ARG_EX) {
+                // Only when List exists already???
+                data.args.push_back(piece);
+            } else {
+                data.error = "invalid command format";
+            }
+        }
+        i++;
+    }
+}
+
+void parse_oget(const std::vector<std::string>& pieces, InputData& data) {
+}
+
+void parse_oset(const std::vector<std::string>& pieces, InputData& data) {
+}
+
+void parse_sget(const std::vector<std::string>& pieces, InputData& data) {
+}
+
+void parse_sset(const std::vector<std::string>& pieces, InputData& data) {
+}
+
+void parse_del(const std::vector<std::string>& pieces, InputData& data) {
+    int i = 1;
+    while (i < pieces.size()) {
+        const std::string& piece = pieces[i];
+        if (i == 1) {
+            data.key = util::trim(piece);
+        }
+        i++;
+    }
+}
+
 
 void parse_nonkey_input(const std::vector<std::string>& pieces, InputData& data) {
     int i = 1;
@@ -270,6 +379,18 @@ void parse_nonkey_input(const std::vector<std::string>& pieces, InputData& data)
 }
 
 
-bool is_key_command(std::string cmd) {
-    return cmd == GET || cmd == SET || cmd == DEL || cmd == KEY;
+bool is_key_command(const std::string& cmd) {
+    return cmd == GET
+        || cmd == SET
+        || cmd == LGET
+        || cmd == LSET
+        || cmd == HGET
+        || cmd == HSET
+        || cmd == SGET
+        || cmd == SSET
+        || cmd == OGET
+        || cmd == OSET
+        || cmd == DEL
+        || cmd == KEY
+        || cmd == TTL;
 }

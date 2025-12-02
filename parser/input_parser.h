@@ -35,6 +35,7 @@
 
 #define DEL "DEL"
 #define KEY "KEY"
+#define TTL "TTL"
 #define INFO "INFO"
 #define SHARD "SHARD"
 #define RESHARD "RESHARD"
@@ -50,7 +51,10 @@ struct InputData {
     //uint32_t ttl; // ttl
     std::string ttl;
     std::string inc;
-    std::string id; // for shard command
+    // For:
+    // 1. shard command shard_id
+    // 2. List index
+    std::string id;
     std::string value; // the value
 };
 
@@ -82,7 +86,7 @@ void parse_ttl(const std::vector<std::string>& pieces, InputData &data);
 /// @param data
 void parse_nonkey_input(const std::vector<std::string> &pieces, InputData &data);
 
-bool is_key_command(std::string cmd);
+bool is_key_command(const std::string& cmd);
 
 
 #endif //YEEKV_CLI_INPUT_PARSE_H
