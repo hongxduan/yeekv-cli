@@ -20,14 +20,19 @@ namespace util {
     //
     void uint16_to_bytes(uint16_t value, uint8_t bytes[2]);
 
-    //
-    // convert little endian bytes to uint32
-    //
+    /// Convert bytes to uint16
+    /// @param bytes
+    /// @return
+    uint16_t bytes_to_uint16(const uint8_t* bytes);
+
+    /// Convert bytes to uint32
+    /// @param bytes
+    /// @return
     uint32_t bytes_to_uint32(const uint8_t *bytes);
 
-    //
-    // convert little endian bytes to uint32
-    //
+    /// Convert bytes to int32
+    /// @param bytes
+    /// @return
     int32_t bytes_to_int32(const uint8_t *bytes);
 }
 

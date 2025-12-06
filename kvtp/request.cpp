@@ -10,7 +10,7 @@
 
 #include "../util/byte_util.h"
 
-std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
+std::vector<uint8_t> kvtp::encode_request(const InputData& data) {
     std::list<uint8_t> kvtp_bytes;
     std::vector<uint8_t> request;
 
@@ -21,7 +21,7 @@ std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
 
     // CMD: line
     kvtp_bytes.append_range(static_cast<std::string>(CMD_PREFIX));
-    for (const auto c: data.cmd) {
+    for (const auto c : data.cmd) {
         if (c != ZERO) {
             kvtp_bytes.push_back(c);
         }
@@ -30,7 +30,7 @@ std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
 
     // KEY: line
     kvtp_bytes.append_range(static_cast<std::string>(KEY_PREFIX));
-    for (auto c: data.key) {
+    for (auto c : data.key) {
         if (c != ZERO) {
             kvtp_bytes.push_back(c);
         }
@@ -41,8 +41,8 @@ std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
     if (!data.args.empty()) {
         kvtp_bytes.append_range(static_cast<std::string>(ARG_PREFIX));
 
-        for (const auto &arg: data.args) {
-            for (const auto c: arg) {
+        for (const auto& arg : data.args) {
+            for (const auto c : arg) {
                 if (c != ZERO) {
                     kvtp_bytes.push_back(c);
                 }
@@ -59,7 +59,7 @@ std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
         // TTL: line
         kvtp_bytes.append_range(static_cast<std::string>(TTL_PREFIX));
 
-        for (auto c: data.ttl) {
+        for (auto c : data.ttl) {
             if (c != ZERO) {
                 kvtp_bytes.push_back(c);
             }
@@ -71,7 +71,7 @@ std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
         // INC: line
         kvtp_bytes.append_range(static_cast<std::string>(INC_PREFIX));
 
-        for (const auto c: data.inc) {
+        for (const auto c : data.inc) {
             if (c != ZERO) {
                 kvtp_bytes.push_back(c);
             }
@@ -84,7 +84,7 @@ std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
     if (!data.id.empty()) {
         // ID: line
         kvtp_bytes.append_range(static_cast<std::string>(ID_PREFIX));
-        for (const auto c: data.id) {
+        for (const auto c : data.id) {
             kvtp_bytes.push_back(c);
         }
         kvtp_bytes.push_back(LINE_FEED);
@@ -96,7 +96,7 @@ std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
     ///
     /// encode body
     ///
-    std::list<uint8_t> body_bytes;
+    //std::list<uint8_t> body_bytes;
     //uint16_t key_len;
     //uint8_t key_len_bytes[2];
 
@@ -114,13 +114,13 @@ std::vector<uint8_t> kvtp::encode_request(const InputData &data) {
     //body_bytes.push_front(key_len_bytes[0]);
 
     // push value bytes
-    for (auto c: data.value) {
+    /*for (auto c: data.value) {
         if (c != ZERO) {
             body_bytes.push_back(c);
         }
-    }
+    }*/
 
-    kvtp_bytes.append_range(body_bytes);
+    kvtp_bytes.append_range(data.body);
 
     //byte_list.push_back(ZERO);
 

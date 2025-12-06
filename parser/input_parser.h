@@ -18,6 +18,8 @@
 #define ARG_DEL "-del"
 #define ARG_TTL "-ttl"
 #define ARG_INC "-inc"
+#define ARG_F "-f"
+#define ARG_V "-v"
 
 // For shard use
 #define ARG_ID "-id"
@@ -56,35 +58,36 @@ struct InputData {
     // 2. List index
     std::string id;
     std::string value; // the value
+    std::vector<u_char> body;
 };
 
 /// Parse user input to InputData
 /// @param input
 /// @return
-InputData parse_input(std::string input);
+InputData parse_input(const std::string& input);
 
 /// Parse command that has KEY
-void parse_key_input(const std::vector<std::string>& pieces, InputData &data);
+void parse_key_input(const std::vector<std::string>& pieces, InputData& data);
 
-void parse_set(const std::vector<std::string>& pieces, InputData &data);
-void parse_get(const std::vector<std::string>& pieces, InputData &data);
-void parse_lset(const std::vector<std::string>& pieces, InputData &data);
-void parse_lget(const std::vector<std::string>& pieces, InputData &data);
-void parse_hset(const std::vector<std::string>& pieces, InputData &data);
-void parse_hget(const std::vector<std::string>& pieces, InputData &data);
-void parse_sset(const std::vector<std::string>& pieces, InputData &data);
-void parse_sget(const std::vector<std::string>& pieces, InputData &data);
-void parse_oset(const std::vector<std::string>& pieces, InputData &data);
-void parse_oget(const std::vector<std::string>& pieces, InputData &data);
+void parse_set(const std::vector<std::string>& pieces, InputData& data);
+void parse_get(const std::vector<std::string>& pieces, InputData& data);
+void parse_lset(const std::vector<std::string>& pieces, InputData& data);
+void parse_lget(const std::vector<std::string>& pieces, InputData& data);
+void parse_hset(const std::vector<std::string>& pieces, InputData& data);
+void parse_hget(const std::vector<std::string>& pieces, InputData& data);
+void parse_sset(const std::vector<std::string>& pieces, InputData& data);
+void parse_sget(const std::vector<std::string>& pieces, InputData& data);
+void parse_oset(const std::vector<std::string>& pieces, InputData& data);
+void parse_oget(const std::vector<std::string>& pieces, InputData& data);
 
-void parse_del(const std::vector<std::string>& pieces, InputData &data);
-void parse_ttl(const std::vector<std::string>& pieces, InputData &data);
+void parse_del(const std::vector<std::string>& pieces, InputData& data);
+void parse_ttl(const std::vector<std::string>& pieces, InputData& data);
 
 /// Parse command that has NO KEY
 /// The KEY head may use to store sub command
 /// @param pieces
 /// @param data
-void parse_nonkey_input(const std::vector<std::string> &pieces, InputData &data);
+void parse_nonkey_input(const std::vector<std::string>& pieces, InputData& data);
 
 bool is_key_command(const std::string& cmd);
 

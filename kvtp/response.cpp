@@ -3,12 +3,12 @@
 //
 
 #include "response.h"
-
-#include <iostream>
-#include <sstream>
-
 #include "kvtp.h"
 #include "../util/byte_util.h"
+
+#include <iostream>
+#include <map>
+#include <sstream>
 
 void kvtp::decode_response(std::vector<uint8_t> raw_res) {
     std::string raw_str = std::string(raw_res.begin(), raw_res.end());
@@ -103,7 +103,58 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
             // print
             std::cout << idx << ":" << val << std::endl;
         }
-    } else if (data_type == RES_DT_M) {
+    } else if (data_type == RES_DT_H) {
+        uint16_t pos = 0;
+        std::map<std::string, std::string> result;
+        constexpr int field_byte_count = 2;
+        constexpr int value_byte_count = 4;
+        while (pos < body_bytes.size() - (field_byte_count + value_byte_count)) {
+            uint16_t len = 0;
+            std::vector<u_char> len_bytes;
+            std::vector<u_char> fv_bytes = {}; // bytes for field and value
+
+            // Get field length
+            len_bytes.assign(body_bytes.begin() + pos, body_bytes.begin() + pos + field_byte_count);
+            std::string s_num(len_bytes.begin(), len_bytes.end());
+            len = util::bytes_to_uint16(len_bytes.data());
+            pos += field_byte_count; // Forward pos
+
+            if (pos + len >= body_bytes.size()) {
+                std::cout << "ERR:" << "DATA_ERR" << std::endl;
+                return;
+            }
+
+            // Get filed
+            fv_bytes.assign(body_bytes.begin() + pos, body_bytes.begin() + pos + len);
+            std::string field;
+            field.assign(fv_bytes.begin(), fv_bytes.end());
+            //fields.push_back(field);
+            pos += len; // Forward pos
+
+            len_bytes.clear();
+            fv_bytes.clear();
+
+            // Get value length
+            len_bytes.assign(body_bytes.begin() + pos, body_bytes.begin() + pos + value_byte_count);
+            len = util::bytes_to_uint32(len_bytes.data());
+            pos += value_byte_count; // Forward pos
+            if (pos + len > body_bytes.size()) {
+                std::cout << "ERR:" << "DATA_ERR" << std::endl;
+                return;
+            }
+
+            // Get value
+            fv_bytes.assign(body_bytes.begin() + pos, body_bytes.begin() + pos + len);
+            std::string val;
+            val.assign(fv_bytes.begin(), fv_bytes.end());
+            //values.push_back(value);
+            pos += len; // Forward pos
+
+            result.insert(std::make_pair(field, val));
+        }
+        for (auto &[f,v]: result) {
+            std::cout << f << ":" << v << std::endl;
+        }
     } else {
         // error type
     }

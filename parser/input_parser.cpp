@@ -7,15 +7,18 @@
 
 #include "input_parser.h"
 #include "../util/string_util.h"
+#include "../util/byte_util.h"
 
+#include <format>
 #include <fstream>
 #include <iostream>
+#include <list>
 #include <ostream>
 #include <vector>
 
 using namespace std;
 
-InputData parse_input(std::string input) {
+InputData parse_input(const std::string& input) {
     InputData data{
         "",
         "",
@@ -198,8 +201,11 @@ void parse_set(const std::vector<std::string>& pieces, InputData& data) {
                     data.error = "INC value must be a number";
                     return;
                 }
-            } else if (data.value.size() == 0) {
-                data.value = piece;
+            } else if (data.value.empty()) {
+                // data.value = piece;
+                for (auto c : piece) {
+                    data.body.push_back(c);
+                }
             } else {
                 data.error = "invalid command format";
             }
@@ -209,9 +215,113 @@ void parse_set(const std::vector<std::string>& pieces, InputData& data) {
 }
 
 void parse_hget(const std::vector<std::string>& pieces, InputData& data) {
+    int i = 1;
+    std::string piece;
+    auto has_arg = false;
+    std::list<std::string> fields;
+    while (i < pieces.size()) {
+        piece = pieces[i];
+        if (i == 1) {
+            data.key = util::trim(piece);
+        } else {
+            if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_F || piece == ARG_V) {
+                has_arg = true;
+                break;
+            }
+            fields.push_back(piece);
+        }
+        i++;
+    }
+    // parse args
+    if (has_arg) {
+        i--;
+        while (i < pieces.size()) {
+            piece = pieces[i];
+            if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_F || piece == ARG_V) {
+                data.args.push_back(util::trim(piece));
+            } else {
+                data.error = std::format("invalid arg {}", piece);
+            }
+        }
+    }
+    auto f_it = fields.begin();
+    for (auto i = 0; i < fields.size(); i++) {
+        // field
+        const uint16_t f_len = f_it->length();
+        u_char f_len_bytes[2];
+        util::uint16_to_bytes(f_len, f_len_bytes);
+        data.body.append_range(f_len_bytes);
+        for (const auto c : *f_it) {
+            data.body.push_back(c);
+        }
+        std::advance(f_it, 1);
+    }
 }
 
 void parse_hset(const std::vector<std::string>& pieces, InputData& data) {
+    int i = 1;
+    std::string piece;
+    auto has_args = false;
+    std::list<std::string> fields;
+    std::list<std::string> values;
+    while (i < pieces.size()) {
+        piece = pieces[i];
+        if (i == 1) {
+            data.key = util::trim(piece);
+        } else {
+            if (piece == ARG_NX) {
+                has_args = true;
+                break;
+            }
+            if (i % 2 == 0) {
+                // field
+                fields.push_back(piece);
+            } else {
+                // value
+                values.push_back(piece);
+            }
+        }
+        i++;
+    }
+    if (fields.size() != values.size()) {
+        data.error = "invalid field or values count";
+    }
+    // parse args
+    if (has_args) {
+        i--;
+        while (i < pieces.size()) {
+            piece = pieces[i];
+            if (piece == ARG_NX) {
+                data.args.push_back(util::trim(piece));
+            } else {
+                data.error = std::format("invalid arg {}", piece);
+            }
+        }
+    }
+    //
+    auto f_it = fields.begin();
+    auto v_it = values.begin();
+    for (auto i = 0; i < fields.size(); i++) {
+        // field
+        const uint16_t f_len = f_it->length();
+        u_char f_len_bytes[2];
+        util::uint16_to_bytes(f_len, f_len_bytes);
+        data.body.append_range(f_len_bytes);
+        for (const auto c : *f_it) {
+            data.body.push_back(c);
+        }
+        // value
+        const uint32_t v_len = v_it->length();
+        u_char v_len_bytes[4];
+        util::uint32_to_bytes(v_len, v_len_bytes);
+        data.body.append_range(v_len_bytes);
+        for (const auto c : *v_it) {
+            data.body.push_back(c);
+        }
+        ++f_it;
+        ++v_it;
+    }
+    std::string body(data.body.begin(), data.body.end());
 }
 
 void parse_lget(const std::vector<std::string>& pieces, InputData& data) {
@@ -242,9 +352,6 @@ void parse_lget(const std::vector<std::string>& pieces, InputData& data) {
 }
 
 void parse_lset(const std::vector<std::string>& pieces, InputData& data) {
-    //Examples:
-    // LSET users 0 tom
-    // LSET users -1 jerry
     int i = 1;
     while (i < pieces.size()) {
         const std::string& piece = pieces[i];
@@ -254,7 +361,10 @@ void parse_lset(const std::vector<std::string>& pieces, InputData& data) {
             // Index
             data.id = util::trim(piece);
         } else if (i == 3) {
-            data.value = util::trim(piece);
+            //data.value = util::trim(piece);
+            for (auto c : piece) {
+                data.body.push_back(c);
+            }
         } else {
             if (piece == ARG_EX) {
                 // Only when List exists already???
