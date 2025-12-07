@@ -104,6 +104,10 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
             std::cout << idx << ":" << val << std::endl;
         }
     } else if (data_type == RES_DT_H) {
+        if (body_bytes.empty()) {
+            std::cout << "ERR:" << "field not exist" << std::endl;
+            return;
+        }
         uint16_t pos = 0;
         std::map<std::string, std::string> result;
         constexpr int field_byte_count = 2;
@@ -152,7 +156,7 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
 
             result.insert(std::make_pair(field, val));
         }
-        for (auto &[f,v]: result) {
+        for (auto& [f,v] : result) {
             std::cout << f << ":" << v << std::endl;
         }
     } else {

@@ -234,16 +234,22 @@ void parse_hget(const std::vector<std::string>& pieces, InputData& data) {
     }
     // parse args
     if (has_arg) {
-        i--;
         while (i < pieces.size()) {
             piece = pieces[i];
             if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_F || piece == ARG_V) {
                 data.args.push_back(util::trim(piece));
             } else {
                 data.error = std::format("invalid arg {}", piece);
+                return;
             }
+            i++;
+        }
+        if (data.args.size() > 1) {
+            data.error = "too many arguments";
+            return;
         }
     }
+
     auto f_it = fields.begin();
     for (auto i = 0; i < fields.size(); i++) {
         // field
@@ -288,7 +294,6 @@ void parse_hset(const std::vector<std::string>& pieces, InputData& data) {
     }
     // parse args
     if (has_args) {
-        i--;
         while (i < pieces.size()) {
             piece = pieces[i];
             if (piece == ARG_NX) {
@@ -296,6 +301,7 @@ void parse_hset(const std::vector<std::string>& pieces, InputData& data) {
             } else {
                 data.error = std::format("invalid arg {}", piece);
             }
+            i++;
         }
     }
     //
@@ -325,14 +331,6 @@ void parse_hset(const std::vector<std::string>& pieces, InputData& data) {
 }
 
 void parse_lget(const std::vector<std::string>& pieces, InputData& data) {
-    // Examples:
-    // LGET users 0
-    // LGET users #
-    // LGET users &tom
-    // LGET users 0..-1
-    // LGET users ..
-    // LGET users 0 -del
-
     int i = 1;
     while (i < pieces.size()) {
         const std::string& piece = pieces[i];
