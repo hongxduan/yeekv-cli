@@ -290,8 +290,10 @@ void parse_hset(const std::vector<std::string>& pieces, InputData& data) {
         i++;
     }
     if (fields.size() != values.size()) {
-        data.error = "invalid field or values count";
+        data.error = "field and value count no match";
+        return;
     }
+
     // parse args
     if (has_args) {
         while (i < pieces.size()) {

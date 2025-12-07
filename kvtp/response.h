@@ -19,8 +19,10 @@
 #define RES_DT_LS "LS"  // List of String
 
 namespace kvtp {
-    // decode KVTP response from server
-    void decode_response(std::vector<uint8_t>);
+    /// Decode kvtp response from server
+    /// @param raw_res
+    /// @return
+    void decode_response(std::vector<uint8_t> raw_res);
 }
 
 

@@ -7,8 +7,20 @@
 #include "../util/byte_util.h"
 
 #include <iostream>
+#include <list>
 #include <map>
+#include <print>
 #include <sstream>
+
+
+void print_ok() {
+    std::cout << "(ok)" << std::endl;
+}
+
+void print_error(const std::string& error) {
+    std::cerr << "(err)" << std::endl;
+    std::cerr << error << std::endl;
+}
 
 void kvtp::decode_response(std::vector<uint8_t> raw_res) {
     std::string raw_str = std::string(raw_res.begin(), raw_res.end());
@@ -84,7 +96,7 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
     } else if (data_type == RES_DT_LD) {
     } else if (data_type == RES_DT_LS) {
         int read = 0;
-        int idx = 0;
+        std::list<std::string> result;
         while (read < body_bytes.size()) {
             // read item length
             uint8_t len_bytes[4];
@@ -92,20 +104,26 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
             read += 4;
             auto len = util::bytes_to_int32(len_bytes);
             if (read + len > body_bytes.size()) {
-                std::cout << "ERR:" << "DATA_ERR" << std::endl;
+                print_error("data error");
+                return;
             }
             // read item
             uint8_t bytes[len];
             std::copy(body_bytes.begin() + read, body_bytes.begin() + read + len, bytes);
             read += len;
             auto val = std::string(bytes, bytes + len);
-            ++idx;
+            result.push_back(val);
             // print
-            std::cout << idx << ":" << val << std::endl;
+            //std::cout << idx << ":" << val << std::endl;
+        }
+        print_ok();
+        int idx = 0;
+        for (auto s : result) {
+            std::println("{}: {}", ++idx, s);
         }
     } else if (data_type == RES_DT_H) {
         if (body_bytes.empty()) {
-            std::cout << "ERR:" << "field not exist" << std::endl;
+            print_error("empty");
             return;
         }
         uint16_t pos = 0;
@@ -124,7 +142,7 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
             pos += field_byte_count; // Forward pos
 
             if (pos + len >= body_bytes.size()) {
-                std::cout << "ERR:" << "DATA_ERR" << std::endl;
+                print_error("data error");
                 return;
             }
 
@@ -143,7 +161,7 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
             len = util::bytes_to_uint32(len_bytes.data());
             pos += value_byte_count; // Forward pos
             if (pos + len > body_bytes.size()) {
-                std::cout << "ERR:" << "DATA_ERR" << std::endl;
+                print_error("data error");
                 return;
             }
 
@@ -156,8 +174,9 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
 
             result.insert(std::make_pair(field, val));
         }
+        print_ok();
         for (auto& [f,v] : result) {
-            std::cout << f << ":" << v << std::endl;
+            std::println("{}: {}", f, v);
         }
     } else {
         // error type

@@ -22,16 +22,16 @@
 
 void printOS();
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
     printOS();
 
     argparse::ArgumentParser parser("yeekv");
 
     parser.add_argument("-h", "--host")
-            .help("host ip");
+          .help("host ip");
 
     parser.add_argument("-p", "--port")
-            .help("port").scan<'i', uint16_t>();
+          .help("port").scan<'i', uint16_t>();
 
     parser.parse_args(argc, argv);
 
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
     inet_pton(AF_INET, host.c_str(), &server_addr.sin_addr);
 
     // sending connection request
-    connect(client_sock, reinterpret_cast<struct sockaddr *>(&server_addr), sizeof(server_addr));
+    connect(client_sock, reinterpret_cast<struct sockaddr*>(&server_addr), sizeof(server_addr));
 
     // command line input
     std::string input;
@@ -65,6 +65,7 @@ int main(int argc, char *argv[]) {
         // parse input
         InputData data = parse_input(input);
         if (!data.error.empty()) {
+            std::cerr << "(err)" << std::endl;
             std::cout << data.error << std::endl;
             continue;
         }
