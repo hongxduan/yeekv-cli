@@ -59,7 +59,7 @@ std::vector<uint8_t> kvtp::encode_request(const InputData& data) {
         // TTL: line
         kvtp_bytes.append_range(static_cast<std::string>(TTL_PREFIX));
 
-        for (auto c : data.ttl) {
+        for (const auto c : data.ttl) {
             if (c != ZERO) {
                 kvtp_bytes.push_back(c);
             }

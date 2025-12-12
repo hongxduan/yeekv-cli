@@ -20,6 +20,7 @@
 #define ARG_INC "-inc"
 #define ARG_F "-f"
 #define ARG_V "-v"
+#define ARG_N "-n"
 
 // For shard use
 #define ARG_ID "-id"
@@ -80,6 +81,7 @@ void parse_sget(const std::vector<std::string>& pieces, InputData& data);
 void parse_oset(const std::vector<std::string>& pieces, InputData& data);
 void parse_oget(const std::vector<std::string>& pieces, InputData& data);
 
+void parse_key(const std::vector<std::string>& pieces, InputData& data);
 void parse_del(const std::vector<std::string>& pieces, InputData& data);
 void parse_ttl(const std::vector<std::string>& pieces, InputData& data);
 

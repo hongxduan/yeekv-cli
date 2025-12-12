@@ -120,6 +120,8 @@ void parse_key_input(const std::vector<std::string>& pieces, InputData& data) {
         parse_oget(pieces, data);
     } else if (data.cmd == OSET) {
         parse_oset(pieces, data);
+    } else if (data.cmd == KEY) {
+        parse_key(pieces, data);
     }
 }
 
@@ -387,6 +389,87 @@ void parse_sget(const std::vector<std::string>& pieces, InputData& data) {
 }
 
 void parse_sset(const std::vector<std::string>& pieces, InputData& data) {
+    // Syntax:
+    // SSET <key> value1 [value2...]
+    // Return:
+    // Number of values set
+    int i = 1;
+    std::list<std::string> values = {};
+    while (i < pieces.size()) {
+        const std::string& piece = pieces[i];
+        if (i == 1) {
+            data.key = util::trim(piece);
+        } else {
+            values.push_back(piece);
+        }
+        ++i;
+    }
+    for (auto v : values) {
+        const uint32_t v_len = v.size();
+        u_char v_len_bytes[4];
+        util::uint32_to_bytes(v_len, v_len_bytes);
+        data.body.append_range(v_len_bytes);
+        for (const auto c : v) {
+            data.body.push_back(c);
+        }
+    }
+}
+
+void parse_key(const std::vector<std::string>& pieces, InputData& data) {
+    // Syntax:
+    // KEY <key> [-n num]
+    // - key: string pattern to search the key
+    //      - use `*` to match any character(s)
+    //      - the `*` can be the first and/or the last character
+    // - num: limit the result count, default is 10
+    // Return:
+    // The key(s) if find any, and the type of the key
+    int i = 1;
+    std::string piece;
+    auto has_arg = false;
+    std::list<std::string> fields;
+    while (i < pieces.size()) {
+        piece = pieces[i];
+        if (i == 1) {
+            data.key = util::trim(piece);
+        } else {
+            if (piece == ARG_N) {
+                has_arg = true;
+                break;
+            }
+            fields.push_back(piece);
+        }
+        i++;
+    }
+    // parse args
+    if (has_arg) {
+        while (i < pieces.size()) {
+            piece = pieces[i];
+            if (piece == ARG_N) {
+                //data.args.push_back(util::trim(piece));
+                if (i + 1 == pieces.size()) {
+                    // means no num provided
+                    data.error = "invalid number";
+                    return;
+                }
+                data.inc = piece[++i];
+                try {
+                    std::strtol(data.inc.c_str(), nullptr, 10);
+                } catch (exception& e) {
+                    data.error = "invalid number";
+                    return;
+                }
+            } else {
+                data.error = std::format("invalid arg {}", piece);
+                return;
+            }
+            i++;
+        }
+        if (data.args.size() > 1) {
+            data.error = "too many arguments";
+            return;
+        }
+    }
 }
 
 void parse_del(const std::vector<std::string>& pieces, InputData& data) {
@@ -488,14 +571,13 @@ void parse_nonkey_input(const std::vector<std::string>& pieces, InputData& data)
     }
 }
 
-
 bool is_key_command(const std::string& cmd) {
     return cmd == GET
         || cmd == SET
-        || cmd == LGET
-        || cmd == LSET
         || cmd == HGET
         || cmd == HSET
+        || cmd == LGET
+        || cmd == LSET
         || cmd == SGET
         || cmd == SSET
         || cmd == OGET
