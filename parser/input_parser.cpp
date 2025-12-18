@@ -6,8 +6,6 @@
 //
 
 #include "input_parser.h"
-#include "../util/string_util.h"
-#include "../util/byte_util.h"
 
 #include <format>
 #include <fstream>
@@ -16,24 +14,20 @@
 #include <ostream>
 #include <vector>
 
+#include "../util/byte_util.h"
+#include "../util/string_util.h"
+
 using namespace std;
 
-InputData parse_input(const std::string& input) {
-    InputData data{
-        "",
-        "",
-        "",
-        {},
-        "",
-        "",
-        ""
-    };
+InputData parse_input(const std::string &input) {
+    InputData data = {};
 
     std::vector<std::string> pieces;
 
-    bool quoted = false; // check double-quoted or not during walk through input
-    uint si = 0; // start index
-    uint ei = 0; // end index
+    bool quoted =
+        false;    // check double-quoted or not during walk through input
+    uint si = 0;  // start index
+    uint ei = 0;  // end index
 
     char pre;
     const uint len = input.size();
@@ -72,7 +66,7 @@ InputData parse_input(const std::string& input) {
                     }
                     pieces.push_back(piece);
                 }
-                //std::cout << piece << std::endl;
+                // std::cout << piece << std::endl;
                 si = i + 1;
             }
         } else if (cur == DQUOTE_CHAR) {
@@ -99,7 +93,7 @@ InputData parse_input(const std::string& input) {
     return data;
 }
 
-void parse_key_input(const std::vector<std::string>& pieces, InputData& data) {
+void parse_key_input(const std::vector<std::string> &pieces, InputData &data) {
     if (data.cmd == GET) {
         parse_get(pieces, data);
     } else if (data.cmd == SET) {
@@ -125,10 +119,10 @@ void parse_key_input(const std::vector<std::string>& pieces, InputData& data) {
     }
 }
 
-void parse_get(const std::vector<std::string>& pieces, InputData& data) {
+void parse_get(const std::vector<std::string> &pieces, InputData &data) {
     int i = 1;
     while (i < pieces.size()) {
-        const std::string& piece = pieces[i];
+        const std::string &piece = pieces[i];
         if (i == 1) {
             data.key = util::trim(piece);
         } else {
@@ -148,10 +142,10 @@ void parse_get(const std::vector<std::string>& pieces, InputData& data) {
     }
 }
 
-void parse_set(const std::vector<std::string>& pieces, InputData& data) {
+void parse_set(const std::vector<std::string> &pieces, InputData &data) {
     int i = 1;
     while (i < pieces.size()) {
-        const std::string& piece = pieces[i];
+        const std::string &piece = pieces[i];
         if (i == 1) {
             data.key = util::trim(piece);
         } else {
@@ -174,7 +168,7 @@ void parse_set(const std::vector<std::string>& pieces, InputData& data) {
                         // i need forward one step, because consumed 2 pieces
                         // piece 1: -ttl, piece 2: the ttl
                         i++;
-                    } catch (const std::invalid_argument& e) {
+                    } catch (const std::invalid_argument &e) {
                         data.error = "invalid ttl";
                         return;
                     }
@@ -195,7 +189,7 @@ void parse_set(const std::vector<std::string>& pieces, InputData& data) {
                         // i need forward one step, because consumed 2 pieces
                         // piece 1: -inc, piece 2: the inc number
                         i++;
-                    } catch (const std::invalid_argument& e) {
+                    } catch (const std::invalid_argument &e) {
                         data.error = "INC value must be a number";
                         return;
                     }
@@ -216,7 +210,7 @@ void parse_set(const std::vector<std::string>& pieces, InputData& data) {
     }
 }
 
-void parse_hget(const std::vector<std::string>& pieces, InputData& data) {
+void parse_hget(const std::vector<std::string> &pieces, InputData &data) {
     int i = 1;
     std::string piece;
     auto has_arg = false;
@@ -226,7 +220,8 @@ void parse_hget(const std::vector<std::string>& pieces, InputData& data) {
         if (i == 1) {
             data.key = util::trim(piece);
         } else {
-            if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_F || piece == ARG_V) {
+            if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_F ||
+                piece == ARG_V) {
                 has_arg = true;
                 break;
             }
@@ -238,7 +233,8 @@ void parse_hget(const std::vector<std::string>& pieces, InputData& data) {
     if (has_arg) {
         while (i < pieces.size()) {
             piece = pieces[i];
-            if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_F || piece == ARG_V) {
+            if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_F ||
+                piece == ARG_V) {
                 data.args.push_back(util::trim(piece));
             } else {
                 data.error = std::format("invalid arg {}", piece);
@@ -266,7 +262,7 @@ void parse_hget(const std::vector<std::string>& pieces, InputData& data) {
     }
 }
 
-void parse_hset(const std::vector<std::string>& pieces, InputData& data) {
+void parse_hset(const std::vector<std::string> &pieces, InputData &data) {
     int i = 1;
     std::string piece;
     auto has_args = false;
@@ -334,10 +330,10 @@ void parse_hset(const std::vector<std::string>& pieces, InputData& data) {
     std::string body(data.body.begin(), data.body.end());
 }
 
-void parse_lget(const std::vector<std::string>& pieces, InputData& data) {
+void parse_lget(const std::vector<std::string> &pieces, InputData &data) {
     int i = 1;
     while (i < pieces.size()) {
-        const std::string& piece = pieces[i];
+        const std::string &piece = pieces[i];
         if (i == 1) {
             data.key = util::trim(piece);
         } else if (i == 2) {
@@ -353,17 +349,17 @@ void parse_lget(const std::vector<std::string>& pieces, InputData& data) {
     }
 }
 
-void parse_lset(const std::vector<std::string>& pieces, InputData& data) {
+void parse_lset(const std::vector<std::string> &pieces, InputData &data) {
     int i = 1;
     while (i < pieces.size()) {
-        const std::string& piece = pieces[i];
+        const std::string &piece = pieces[i];
         if (i == 1) {
             data.key = util::trim(piece);
         } else if (i == 2) {
             // Index
             data.id = util::trim(piece);
         } else if (i == 3) {
-            //data.value = util::trim(piece);
+            // data.value = util::trim(piece);
             for (auto c : piece) {
                 data.body.push_back(c);
             }
@@ -379,16 +375,101 @@ void parse_lset(const std::vector<std::string>& pieces, InputData& data) {
     }
 }
 
-void parse_oget(const std::vector<std::string>& pieces, InputData& data) {
+void parse_oget(const std::vector<std::string> &pieces, InputData &data) {}
+
+void parse_oset(const std::vector<std::string> &pieces, InputData &data) {}
+
+void parse_sget(const std::vector<std::string> &pieces, InputData &data) {
+    // Syntax:
+    // SGET <key1> [<key2>...] [-i|-u|-d] [-s <new_key>] [-r count] [-del]
+    int i = 1;
+    std::string piece;
+    auto has_args = false;
+    // SET is special because the SGET may have multiple keys
+    std::list<string> keys = {};
+    while (i < pieces.size()) {
+        piece = pieces[i];
+        if (i == 1) {
+            data.key = util::trim(piece);
+        } else {
+            if (piece == ARG_I || piece == ARG_U || piece == ARG_D ||
+                piece == ARG_S || piece == ARG_R) {
+                has_args = true;
+                break;
+            } else {
+                // Additonal keys
+                keys.push_back(piece);
+            }
+        }
+        i++;
+    }
+    // Encode key(s) as list item
+    for (auto key : keys) {
+        const uint16_t len = key.size();
+        u_char len_bytes[2];
+        util::uint16_to_bytes(len, len_bytes);
+        data.keys.append_range(len_bytes);
+        for (const auto c : key) {
+            data.keys.push_back(c);
+        }
+    }
+    if (has_args) {
+        auto has_u = false;
+        auto has_d = false;
+        auto has_i = false;
+        while (i < pieces.size()) {
+            piece = pieces[i];
+            if (piece == ARG_D) {
+                if (has_i || has_u) {
+                    data.error = "args -d -i -u are mutual exclusive";
+                    return;
+                }
+                has_d = true;
+                data.args.push_back(util::trim(piece));
+            } else if (piece == ARG_I) {
+                if (has_d || has_u) {
+                    data.error = "args -d -i -u are mutual exclusive";
+                    return;
+                }
+                has_i = true;
+                data.args.push_back(util::trim(piece));
+            } else if (piece == ARG_U) {
+                if (has_d || has_i) {
+                    data.error = "args -d -i -u are mutual exclusive";
+                    return;
+                }
+                has_u = true;
+                data.args.push_back(util::trim(piece));
+            } else if (piece == ARG_S) {
+                // append the store key to the data.keys as the last key
+                ++i;
+                if (i >= pieces.size()) {
+                    // means no num provided
+                    data.error = "missing <key> for arg -i";
+                    return;
+                }
+                auto key = util::trim(pieces[i]);
+                const uint16_t len = key.size();
+                u_char len_bytes[2];
+                util::uint16_to_bytes(len, len_bytes);
+                data.keys.append_range(len_bytes);
+                for (const auto c : key) {
+                    data.keys.push_back(c);
+                }
+            } else if (piece == ARG_R) {
+                if (!has_d && !has_i && !has_u) {
+                    data.error = "";
+                    return;
+                }
+            } else {
+                data.error = std::format("invalid arg {}", piece);
+            }
+            ++i;
+        }
+    }
 }
 
-void parse_oset(const std::vector<std::string>& pieces, InputData& data) {
-}
-
-void parse_sget(const std::vector<std::string>& pieces, InputData& data) {
-}
-
-void parse_sset(const std::vector<std::string>& pieces, InputData& data) {
+void parse_sset(const std::vector<std::string> &pieces, InputData &data) {
     // Syntax:
     // SSET <key> value1 [value2...]
     // Return:
@@ -396,7 +477,7 @@ void parse_sset(const std::vector<std::string>& pieces, InputData& data) {
     int i = 1;
     std::list<std::string> values = {};
     while (i < pieces.size()) {
-        const std::string& piece = pieces[i];
+        const std::string &piece = pieces[i];
         if (i == 1) {
             data.key = util::trim(piece);
         } else {
@@ -415,7 +496,7 @@ void parse_sset(const std::vector<std::string>& pieces, InputData& data) {
     }
 }
 
-void parse_key(const std::vector<std::string>& pieces, InputData& data) {
+void parse_key(const std::vector<std::string> &pieces, InputData &data) {
     // Syntax:
     // KEY <key> [-n num]
     // - key: string pattern to search the key
@@ -446,7 +527,7 @@ void parse_key(const std::vector<std::string>& pieces, InputData& data) {
         while (i < pieces.size()) {
             piece = pieces[i];
             if (piece == ARG_N) {
-                //data.args.push_back(util::trim(piece));
+                // data.args.push_back(util::trim(piece));
                 if (i + 1 == pieces.size()) {
                     // means no num provided
                     data.error = "invalid number";
@@ -455,7 +536,7 @@ void parse_key(const std::vector<std::string>& pieces, InputData& data) {
                 data.inc = piece[++i];
                 try {
                     std::strtol(data.inc.c_str(), nullptr, 10);
-                } catch (exception& e) {
+                } catch (exception &e) {
                     data.error = "invalid number";
                     return;
                 }
@@ -472,10 +553,10 @@ void parse_key(const std::vector<std::string>& pieces, InputData& data) {
     }
 }
 
-void parse_del(const std::vector<std::string>& pieces, InputData& data) {
+void parse_del(const std::vector<std::string> &pieces, InputData &data) {
     int i = 1;
     while (i < pieces.size()) {
-        const std::string& piece = pieces[i];
+        const std::string &piece = pieces[i];
         if (i == 1) {
             data.key = util::trim(piece);
         }
@@ -483,8 +564,8 @@ void parse_del(const std::vector<std::string>& pieces, InputData& data) {
     }
 }
 
-
-void parse_nonkey_input(const std::vector<std::string>& pieces, InputData& data) {
+void parse_nonkey_input(const std::vector<std::string> &pieces,
+                        InputData &data) {
     int i = 1;
     while (i < pieces.size()) {
         if (data.cmd == SHARD) {
@@ -571,18 +652,8 @@ void parse_nonkey_input(const std::vector<std::string>& pieces, InputData& data)
     }
 }
 
-bool is_key_command(const std::string& cmd) {
-    return cmd == GET
-        || cmd == SET
-        || cmd == HGET
-        || cmd == HSET
-        || cmd == LGET
-        || cmd == LSET
-        || cmd == SGET
-        || cmd == SSET
-        || cmd == OGET
-        || cmd == OSET
-        || cmd == DEL
-        || cmd == KEY
-        || cmd == TTL;
+bool is_key_command(const std::string &cmd) {
+    return cmd == GET || cmd == SET || cmd == HGET || cmd == HSET ||
+           cmd == LGET || cmd == LSET || cmd == SGET || cmd == SSET ||
+           cmd == OGET || cmd == OSET || cmd == DEL || cmd == KEY || cmd == TTL;
 }

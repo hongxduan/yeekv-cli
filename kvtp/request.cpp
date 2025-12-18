@@ -30,11 +30,12 @@ std::vector<uint8_t> kvtp::encode_request(const InputData& data) {
 
     // KEY: line
     kvtp_bytes.append_range(static_cast<std::string>(KEY_PREFIX));
-    for (auto c : data.key) {
+    kvtp_bytes.append_range(data.keys);
+    /*(for (auto c : data.key) {
         if (c != ZERO) {
             kvtp_bytes.push_back(c);
         }
-    }
+    }*/
     kvtp_bytes.push_back(LINE_FEED);
 
     // ARGS: line
