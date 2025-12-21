@@ -8,6 +8,8 @@
 #ifndef YEEKV_CLI_INPUT_PARSE_H
 #define YEEKV_CLI_INPUT_PARSE_H
 
+#include <list>
+
 #define SPACE_CHAR ' '
 #define DQUOTE_CHAR '"'
 #define BSLASH_CHAR '\\'
@@ -52,9 +54,9 @@
 #include <vector>
 
 struct InputData {
-    std::string error;              // if it has error
-    std::string cmd;                // the command
-    std::string key;                // the key
+    std::string error;  // if it has error
+    std::string cmd;    // the command
+    std::string key;    // the key
     std::vector<u_char> keys;
     std::vector<std::string> args;  // arguments
     // uint32_t ttl; // ttl
@@ -90,6 +92,8 @@ void parse_oget(const std::vector<std::string> &pieces, InputData &data);
 void parse_key(const std::vector<std::string> &pieces, InputData &data);
 void parse_del(const std::vector<std::string> &pieces, InputData &data);
 void parse_ttl(const std::vector<std::string> &pieces, InputData &data);
+
+void encode_keys(std::list<std::string> keys, InputData &data);
 
 /// Parse command that has NO KEY
 /// The KEY head may use to store sub command

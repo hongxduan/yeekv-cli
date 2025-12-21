@@ -124,7 +124,8 @@ void parse_get(const std::vector<std::string> &pieces, InputData &data) {
     while (i < pieces.size()) {
         const std::string &piece = pieces[i];
         if (i == 1) {
-            data.key = util::trim(piece);
+            std::list<std::string> keys = {util::trim(piece)};
+            encode_keys(keys, data);
         } else {
             // process commands with KEY
             if (piece == ARG_DEL) {
@@ -147,7 +148,9 @@ void parse_set(const std::vector<std::string> &pieces, InputData &data) {
     while (i < pieces.size()) {
         const std::string &piece = pieces[i];
         if (i == 1) {
-            data.key = util::trim(piece);
+            // data.key = util::trim(piece);
+            std::list<std::string> keys = {util::trim(piece)};
+            encode_keys(keys, data);
         } else {
             // process commands with KEY
             if (piece == ARG_EX || piece == ARG_NX) {
@@ -218,7 +221,9 @@ void parse_hget(const std::vector<std::string> &pieces, InputData &data) {
     while (i < pieces.size()) {
         piece = pieces[i];
         if (i == 1) {
-            data.key = util::trim(piece);
+            // data.key = util::trim(piece);
+            std::list<std::string> keys = {util::trim(piece)};
+            encode_keys(keys, data);
         } else {
             if (piece == ARG_DEL || piece == ARG_EX || piece == ARG_F ||
                 piece == ARG_V) {
@@ -271,7 +276,9 @@ void parse_hset(const std::vector<std::string> &pieces, InputData &data) {
     while (i < pieces.size()) {
         piece = pieces[i];
         if (i == 1) {
-            data.key = util::trim(piece);
+            // data.key = util::trim(piece);
+            std::list<std::string> keys = {util::trim(piece)};
+            encode_keys(keys, data);
         } else {
             if (piece == ARG_NX) {
                 has_args = true;
@@ -335,7 +342,9 @@ void parse_lget(const std::vector<std::string> &pieces, InputData &data) {
     while (i < pieces.size()) {
         const std::string &piece = pieces[i];
         if (i == 1) {
-            data.key = util::trim(piece);
+            // data.key = util::trim(piece);
+            std::list<std::string> keys = {util::trim(piece)};
+            encode_keys(keys, data);
         } else if (i == 2) {
             // Index
             data.id = util::trim(piece);
@@ -354,7 +363,9 @@ void parse_lset(const std::vector<std::string> &pieces, InputData &data) {
     while (i < pieces.size()) {
         const std::string &piece = pieces[i];
         if (i == 1) {
-            data.key = util::trim(piece);
+            // data.key = util::trim(piece);
+            std::list<std::string> keys = {util::trim(piece)};
+            encode_keys(keys, data);
         } else if (i == 2) {
             // Index
             data.id = util::trim(piece);
@@ -390,7 +401,8 @@ void parse_sget(const std::vector<std::string> &pieces, InputData &data) {
     while (i < pieces.size()) {
         piece = pieces[i];
         if (i == 1) {
-            data.key = util::trim(piece);
+            // data.key = util::trim(piece);
+            keys.push_back(util::trim(piece));
         } else {
             if (piece == ARG_I || piece == ARG_U || piece == ARG_D ||
                 piece == ARG_S || piece == ARG_R) {
@@ -404,15 +416,7 @@ void parse_sget(const std::vector<std::string> &pieces, InputData &data) {
         i++;
     }
     // Encode key(s) as list item
-    for (auto key : keys) {
-        const uint16_t len = key.size();
-        u_char len_bytes[2];
-        util::uint16_to_bytes(len, len_bytes);
-        data.keys.append_range(len_bytes);
-        for (const auto c : key) {
-            data.keys.push_back(c);
-        }
-    }
+    encode_keys(keys, data);
     if (has_args) {
         auto has_u = false;
         auto has_d = false;
@@ -561,6 +565,18 @@ void parse_del(const std::vector<std::string> &pieces, InputData &data) {
             data.key = util::trim(piece);
         }
         i++;
+    }
+}
+
+void encode_keys(std::list<std::string> keys, InputData &data) {
+    for (auto key : keys) {
+        const uint16_t len = key.size();
+        u_char len_bytes[2];
+        util::uint16_to_bytes(len, len_bytes);
+        data.keys.append_range(len_bytes);
+        for (const auto c : key) {
+            data.keys.push_back(c);
+        }
     }
 }
 
