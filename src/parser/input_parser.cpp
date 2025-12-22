@@ -5,7 +5,7 @@
 // Input Parser implement
 //
 
-#include "input_parser.h"
+#include "../../inc/parser/input_parser.h"
 
 #include <format>
 #include <fstream>
@@ -14,8 +14,8 @@
 #include <ostream>
 #include <vector>
 
-#include "../util/byte_util.h"
-#include "../util/string_util.h"
+#include "../../inc/util/byte_util.h"
+#include "../../inc/util/string_util.h"
 
 using namespace std;
 

@@ -1,18 +1,11 @@
 cmake_minimum_required(VERSION 4.0)
-project(yeekv_cli)
+project(letkv_cli)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_executable(yeekv-cli main.cpp
-        include/argparse.hpp
-        kvtp/request.cpp
-        kvtp/request.h
-        kvtp/response.cpp
-        kvtp/response.h
-        parser/input_parser.cpp
-        parser/input_parser.h
-        util/string_util.cpp
-        util/string_util.h
-        util/byte_util.cpp
-        util/byte_util.h
-        kvtp/kvtp.h)
+file(GLOB_RECURSE src ${CMAKE_SOURCE_DIR}/src/*.cpp)
+add_executable(letkv-cli ${src})
+
+target_include_directories(letkv-cli 
+        PUBLIC ${CMAKE_SOURCE_DIR}/inc/
+)

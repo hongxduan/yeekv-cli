@@ -2,36 +2,36 @@
 //
 //
 
-#include <bitset>
-#include <cstring>
-#include <iostream>
-#include <bit>
-#include <iterator>
+#include <arpa/inet.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <arpa/inet.h>
-#include "include/argparse.hpp"
-#include "kvtp/request.h"
-#include "kvtp/response.h"
-#include "parser/input_parser.h"
-#include "util/byte_util.h"
-#include "util/string_util.h"
 
-#define PROMPT "yeekv> "
+#include <bit>
+#include <bitset>
+#include <cstring>
+#include <iostream>
+#include <iterator>
+
+#include "../inc/argparse.hpp"
+#include "../inc/kvtp/request.h"
+#include "../inc/kvtp/response.h"
+#include "../inc/parser/input_parser.h"
+#include "../inc/util/byte_util.h"
+#include "../inc/util/string_util.h"
+
+#define PROMPT "letkv> "
 
 void printOS();
 
 int main(int argc, char* argv[]) {
     printOS();
 
-    argparse::ArgumentParser parser("yeekv");
+    argparse::ArgumentParser parser("letkv");
 
-    parser.add_argument("-h", "--host")
-          .help("host ip");
+    parser.add_argument("-h", "--host").help("host ip");
 
-    parser.add_argument("-p", "--port")
-          .help("port").scan<'i', uint16_t>();
+    parser.add_argument("-p", "--port").help("port").scan<'i', uint16_t>();
 
     parser.parse_args(argc, argv);
 
@@ -48,7 +48,8 @@ int main(int argc, char* argv[]) {
     inet_pton(AF_INET, host.c_str(), &server_addr.sin_addr);
 
     // sending connection request
-    connect(client_sock, reinterpret_cast<struct sockaddr*>(&server_addr), sizeof(server_addr));
+    connect(client_sock, reinterpret_cast<struct sockaddr*>(&server_addr),
+            sizeof(server_addr));
 
     // command line input
     std::string input;
@@ -87,11 +88,11 @@ int main(int argc, char* argv[]) {
             std::cout << "server closed connection" << std::endl;
             break;
         } else {
-            //std::cout << "read n:" << n << std::endl;
+            // std::cout << "read n:" << n << std::endl;
         }
         uint32_t len = util::bytes_to_uint32(len_bytes);
 
-        //std::cout << "len:" << len << std::endl;
+        // std::cout << "len:" << len << std::endl;
 
         // read response
         n = 0;
@@ -154,8 +155,8 @@ void printOS() {
 
         std::cout << "bytes:" << bytes << std::endl;
 
-        //uint32_t ii = (bytes[3] << 24) | (bytes[2] << 16) | (bytes[1] << 8) | bytes[0];
-        uint32_t ii ;
+        //uint32_t ii = (bytes[3] << 24) | (bytes[2] << 16) | (bytes[1] << 8) |
+    bytes[0]; uint32_t ii ;
         //std::memcpy(&ii, bytes, sizeof(ii));
         ii = util::convertBeBytesToUint32(bytes);
         std::cout << std::dec << ii << std::endl;

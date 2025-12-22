@@ -2,7 +2,7 @@
 // Created by HongXing on 1/10/25.
 //
 
-#include "response.h"
+#include "../../inc/kvtp/response.h"
 
 #include <iostream>
 #include <list>
@@ -10,8 +10,8 @@
 #include <print>
 #include <sstream>
 
-#include "../util/byte_util.h"
-#include "kvtp.h"
+#include "../../inc/kvtp/kvtp.h"
+#include "../../inc/util/byte_util.h"
 
 // void print_ok() { std::cout << "(ok)" << std::endl; }
 //

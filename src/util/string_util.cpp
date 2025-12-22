@@ -2,10 +2,10 @@
 // Created by HongXing on 1/10/25.
 //
 
-#include "string_util.h"
+#include "../../inc/util/string_util.h"
 
-#include <string>
 #include <algorithm>
+#include <string>
 
 std::string util::to_upper(std::string str) {
     std::transform(str.begin(), str.end(), str.begin(), ::toupper);

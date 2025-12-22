@@ -2,13 +2,13 @@
 // Created by HongXing on 1/10/25.
 //
 
-#include "request.h"
+#include "../../inc/kvtp/request.h"
 
 #include <iostream>
-#include <ostream>
 #include <list>
+#include <ostream>
 
-#include "../util/byte_util.h"
+#include "../../inc/util/byte_util.h"
 
 std::vector<uint8_t> kvtp::encode_request(const InputData& data) {
     std::list<uint8_t> kvtp_bytes;
@@ -97,22 +97,22 @@ std::vector<uint8_t> kvtp::encode_request(const InputData& data) {
     ///
     /// encode body
     ///
-    //std::list<uint8_t> body_bytes;
-    //uint16_t key_len;
-    //uint8_t key_len_bytes[2];
+    // std::list<uint8_t> body_bytes;
+    // uint16_t key_len;
+    // uint8_t key_len_bytes[2];
 
     ////push key bytes
-    //for (auto c: data.key) {
-    //    body_bytes.push_back(c);
-    //}
+    // for (auto c: data.key) {
+    //     body_bytes.push_back(c);
+    // }
 
     //// key length to byte[2]
-    //key_len = body_bytes.size();
-    //util::uint16_to_bytes(key_len, key_len_bytes);
+    // key_len = body_bytes.size();
+    // util::uint16_to_bytes(key_len, key_len_bytes);
 
     //// push key length bytes in body bytes front
-    //body_bytes.push_front(key_len_bytes[1]);
-    //body_bytes.push_front(key_len_bytes[0]);
+    // body_bytes.push_front(key_len_bytes[1]);
+    // body_bytes.push_front(key_len_bytes[0]);
 
     // push value bytes
     /*for (auto c: data.value) {
@@ -123,7 +123,7 @@ std::vector<uint8_t> kvtp::encode_request(const InputData& data) {
 
     kvtp_bytes.append_range(data.body);
 
-    //byte_list.push_back(ZERO);
+    // byte_list.push_back(ZERO);
 
     // prepend request length
     uint32_t request_len = kvtp_bytes.size();
@@ -139,9 +139,9 @@ std::vector<uint8_t> kvtp::encode_request(const InputData& data) {
     request.append_range(kvtp_bytes);
 
     // assign to vector
-    //request.assign(byte_list.begin(), byte_list.end());
+    // request.assign(byte_list.begin(), byte_list.end());
     // ending zero \0
-    //request.push_back(ZERO);
+    // request.push_back(ZERO);
 
     return request;
 }

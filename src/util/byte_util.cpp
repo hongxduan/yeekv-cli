@@ -2,10 +2,9 @@
 // Created by HongXing on 1/10/25.
 //
 
-#include "byte_util.h"
+#include "../../inc/util/byte_util.h"
 
 #include <ostream>
-
 
 void util::int32_to_bytes(const int32_t value, uint8_t bytes[4]) {
     bytes[0] = (value >> 24) & 0xFF;
@@ -29,22 +28,24 @@ void util::uint16_to_bytes(const uint16_t value, uint8_t bytes[2]) {
 uint16_t util::bytes_to_uint16(const uint8_t* bytes) {
     // convert bytes to int first
     const uint16_t result = bytes[0] << 8 | bytes[1];
-    //std::memcpy(&reuslt, bytes, sizeof(result));
+    // std::memcpy(&reuslt, bytes, sizeof(result));
     return result;
 }
 
 uint32_t util::bytes_to_uint32(const uint8_t* bytes) {
     // convert bytes to int first
-    const uint32_t result = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
-    //std::memcpy(&reuslt, bytes, sizeof(result));
+    const uint32_t result =
+        bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+    // std::memcpy(&reuslt, bytes, sizeof(result));
 
     return result;
 }
 
 int32_t util::bytes_to_int32(const uint8_t* bytes) {
     // convert bytes to int first
-    const uint32_t result = bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
-    //std::memcpy(&reuslt, bytes, sizeof(result));
+    const uint32_t result =
+        bytes[0] << 24 | bytes[1] << 16 | bytes[2] << 8 | bytes[3];
+    // std::memcpy(&reuslt, bytes, sizeof(result));
 
     return result;
 }
