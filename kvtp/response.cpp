@@ -3,8 +3,6 @@
 //
 
 #include "response.h"
-#include "kvtp.h"
-#include "../util/byte_util.h"
 
 #include <iostream>
 #include <list>
@@ -12,15 +10,15 @@
 #include <print>
 #include <sstream>
 
+#include "../util/byte_util.h"
+#include "kvtp.h"
 
-void print_ok() {
-    std::cout << "(ok)" << std::endl;
-}
-
-void print_error(const std::string& error) {
-    std::cerr << "(err)" << std::endl;
-    std::cerr << error << std::endl;
-}
+// void print_ok() { std::cout << "(ok)" << std::endl; }
+//
+// void print_error(const std::string& error) {
+//     std::cerr << "(err)" << std::endl;
+//     std::cerr << error << std::endl;
+// }
 
 void kvtp::decode_response(std::vector<uint8_t> raw_res) {
     std::string raw_str = std::string(raw_res.begin(), raw_res.end());
@@ -37,7 +35,7 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
     while (std::getline(stream, tmp, LINE_FEED)) {
         // accumulate header size
         header_size += tmp.size();
-        header_size += 1; // ending '\0'
+        header_size += 1;  // ending '\0'
 
         if (line_num == 0) {
             protocol_status = tmp;
@@ -66,16 +64,25 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
     }
 
     // body is empty
-    if (header_size > raw_res.size()) {
-        std::cout << status << ":" << std::endl;
-        return;
-    }
+    // if (header_size > raw_res.size()) {
+    //    std::cout << status << ":" << std::endl;
+    //    return;
+    //}
 
     //
     // decode body
     //
     std::vector<uint8_t> body_bytes;
     body_bytes.assign(raw_res.begin() + header_size, raw_res.end());
+
+    if (status == kvtp::STATUS_OK) {
+        std::cout << "(ok)" << std::endl;
+    } else {
+        std::cerr << "(err)" << std::endl;
+        std::string err(body_bytes.begin(), body_bytes.end());
+        std::cerr << err << std::endl;
+        return;
+    }
 
     if (data_type == RES_DT_I) {
         if (body_bytes.size() != 4) {
@@ -84,13 +91,15 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
         uint8_t bytes[4];
         std::copy(body_bytes.begin(), body_bytes.end(), bytes);
         auto result = util::bytes_to_int32(bytes);
-        std::cout << status << ":" << result << std::endl;
+        // print_ok();
+        std::cout << result << std::endl;
     } else if (data_type == RES_DT_L) {
     } else if (data_type == RES_DT_D) {
     } else if (data_type == RES_DT_S) {
         std::string result;
         result.assign(body_bytes.begin(), body_bytes.end());
-        std::cout << status << ":" << result << std::endl;
+
+        std::cout << result << std::endl;
     } else if (data_type == RES_DT_LI) {
     } else if (data_type == RES_DT_LL) {
     } else if (data_type == RES_DT_LD) {
@@ -100,82 +109,87 @@ void kvtp::decode_response(std::vector<uint8_t> raw_res) {
         while (read < body_bytes.size()) {
             // read item length
             uint8_t len_bytes[4];
-            std::copy(body_bytes.begin() + read, body_bytes.begin() + read + 4, len_bytes);
+            std::copy(body_bytes.begin() + read, body_bytes.begin() + read + 4,
+                      len_bytes);
             read += 4;
             auto len = util::bytes_to_int32(len_bytes);
             if (read + len > body_bytes.size()) {
-                print_error("data error");
+                std::cerr << "data error" << std::endl;
                 return;
             }
             // read item
             uint8_t bytes[len];
-            std::copy(body_bytes.begin() + read, body_bytes.begin() + read + len, bytes);
+            std::copy(body_bytes.begin() + read,
+                      body_bytes.begin() + read + len, bytes);
             read += len;
             auto val = std::string(bytes, bytes + len);
             result.push_back(val);
             // print
-            //std::cout << idx << ":" << val << std::endl;
+            // std::cout << idx << ":" << val << std::endl;
         }
-        print_ok();
         int idx = 0;
         for (auto s : result) {
             std::println("{}: {}", ++idx, s);
         }
     } else if (data_type == RES_DT_H) {
         if (body_bytes.empty()) {
-            print_error("empty");
+            std::cerr << "empty" << std::endl;
             return;
         }
         uint16_t pos = 0;
         std::map<std::string, std::string> result;
         constexpr int field_byte_count = 2;
         constexpr int value_byte_count = 4;
-        while (pos < body_bytes.size() - (field_byte_count + value_byte_count)) {
+        while (pos <
+               body_bytes.size() - (field_byte_count + value_byte_count)) {
             uint16_t len = 0;
             std::vector<u_char> len_bytes;
-            std::vector<u_char> fv_bytes = {}; // bytes for field and value
+            std::vector<u_char> fv_bytes = {};  // bytes for field and value
 
             // Get field length
-            len_bytes.assign(body_bytes.begin() + pos, body_bytes.begin() + pos + field_byte_count);
+            len_bytes.assign(body_bytes.begin() + pos,
+                             body_bytes.begin() + pos + field_byte_count);
             std::string s_num(len_bytes.begin(), len_bytes.end());
             len = util::bytes_to_uint16(len_bytes.data());
-            pos += field_byte_count; // Forward pos
+            pos += field_byte_count;  // Forward pos
 
             if (pos + len >= body_bytes.size()) {
-                print_error("data error");
+                std::cerr << "data error" << std::endl;
                 return;
             }
 
             // Get filed
-            fv_bytes.assign(body_bytes.begin() + pos, body_bytes.begin() + pos + len);
+            fv_bytes.assign(body_bytes.begin() + pos,
+                            body_bytes.begin() + pos + len);
             std::string field;
             field.assign(fv_bytes.begin(), fv_bytes.end());
-            //fields.push_back(field);
-            pos += len; // Forward pos
+            // fields.push_back(field);
+            pos += len;  // Forward pos
 
             len_bytes.clear();
             fv_bytes.clear();
 
             // Get value length
-            len_bytes.assign(body_bytes.begin() + pos, body_bytes.begin() + pos + value_byte_count);
+            len_bytes.assign(body_bytes.begin() + pos,
+                             body_bytes.begin() + pos + value_byte_count);
             len = util::bytes_to_uint32(len_bytes.data());
-            pos += value_byte_count; // Forward pos
+            pos += value_byte_count;  // Forward pos
             if (pos + len > body_bytes.size()) {
-                print_error("data error");
+                std::cerr << "data error" << std::endl;
                 return;
             }
 
             // Get value
-            fv_bytes.assign(body_bytes.begin() + pos, body_bytes.begin() + pos + len);
+            fv_bytes.assign(body_bytes.begin() + pos,
+                            body_bytes.begin() + pos + len);
             std::string val;
             val.assign(fv_bytes.begin(), fv_bytes.end());
-            //values.push_back(value);
-            pos += len; // Forward pos
+            // values.push_back(value);
+            pos += len;  // Forward pos
 
             result.insert(std::make_pair(field, val));
         }
-        print_ok();
-        for (auto& [f,v] : result) {
+        for (auto& [f, v] : result) {
             std::println("{}: {}", f, v);
         }
     } else {

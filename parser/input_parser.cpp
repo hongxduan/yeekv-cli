@@ -517,7 +517,8 @@ void parse_key(const std::vector<std::string> &pieces, InputData &data) {
     while (i < pieces.size()) {
         piece = pieces[i];
         if (i == 1) {
-            data.key = util::trim(piece);
+            std::list<std::string> keys = {util::trim(piece)};
+            encode_keys(keys, data);
         } else {
             if (piece == ARG_N) {
                 has_arg = true;
